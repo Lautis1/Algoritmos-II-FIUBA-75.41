@@ -35,7 +35,6 @@ nodo_abb_t crear_nodo(char* clave, void* valor){
 	}
 	char* clave_auxiliar = strdup(clave);  //LAS CLAVES SE COPIAN DINAMICAMENTE ?????????
 	if(!clave_auxiliar){
-		free(clave_auxiliar);
 		return NULL;
 	}
 	nodo->clave = clave_auxiliar;
