@@ -27,7 +27,7 @@ struct abb_iter{
 };
 
 /* ******************************************************************
- *                       FUNCIONES AUXILIARES                       *
+ *                       FUNCIONES PRIVADAS                         *
  * *****************************************************************/
 nodo_abb_t crear_nodo(char* clave, void* valor){
 	nodo_abb_t* nodo = malloc(sizeof(nodo_abb_t));
@@ -44,6 +44,28 @@ nodo_abb_t crear_nodo(char* clave, void* valor){
 	nodo->der = NULL;
 	return nodo;
 }
+
+void* buscar_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
+    if (arbol->cmp(clave, nodo->clave) == 0) return nodo->valor;
+
+    else if (arbol->cmp(clave, nodo->clave) > 0) {
+        if (nodo->der != NULL) {
+            return buscar_por_clave(arbol, nodo->der, clave);
+        }
+        else {
+            return NULL;
+        }
+    }
+    else {
+        if (nodo->izq != NULL) {
+            return buscar_por_clave(arbol, nodo->izq, clave);
+        }
+        else {
+            return NULL;
+        }
+    }
+}
+
 /* ******************************************************************
  *                       PRIMITIVAS DEL ABB                         *
  * *****************************************************************/
@@ -59,6 +81,7 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
+    //abb_guardar estaria funcionando como una especie de wrapper para abb_insertar
     if (arbol == NULL) return false;
 
     if (arbol->cantidad == 0) {
@@ -107,4 +130,16 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
             arbol->cantidad++;
         }
     }
+}
+
+void *abb_obtener(const abb_t *arbol, const char *clave) {
+    if (!arbol || arbol->cantidad == 0) return NULL;
+
+    return buscar_por_clave(arbol, arbol->raiz, clave);
+}
+
+bool abb_pertenece(const abb_t *arbol, const char *clave) {
+    if (!arbol || arbol->cantidad == 0) return false;
+
+    return buscar_por_clave(arbol, arbol->raiz, clave) != NULL;
 }
