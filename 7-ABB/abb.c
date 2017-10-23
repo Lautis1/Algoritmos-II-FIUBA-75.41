@@ -58,7 +58,7 @@ void* destruir_nodo(abb_t* arbol, nodo_abb_t* nodo) {
 }
 
 bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato) {
-    // Ya se chequeo si el arbol existe en abb_guardar, no hace revisar de nuevo.
+    // Ya se chequeo si el arbol existe en abb_guardar, no hace falta revisar de nuevo.
     if (arbol->cmp(clave, nodo->clave) == 0) {
         if (arbol->destruir_dato) {
             arbol->destruir_dato(nodo->valor);
@@ -120,13 +120,13 @@ nodo_abb_t* buscar_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
  * *****************************************************************/
 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
-	abb_t* abb = malloc(sizeof(abb_t));
-	if(!abb) return NULL;
-	abb->raiz = NULL;
-	abb->cantidad = 0;
-	abb->cmp= cmp;
-	abb->destruir_dato = destruir_dato;
-	return abb;
+	abb_t* arbol = malloc(sizeof(abb_t));
+	if(!arbol) return NULL;
+	arbol->raiz = NULL;
+	arbol->cantidad = 0;
+	arbol->cmp= cmp;
+	arbol->destruir_dato = destruir_dato;
+	return arbol;
 }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
