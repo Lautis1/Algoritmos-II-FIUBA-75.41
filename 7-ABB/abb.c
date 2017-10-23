@@ -45,14 +45,10 @@ nodo_abb_t* crear_nodo(char* clave, void* valor){
 	return nodo;
 }
 
-//Quizas haya que modificar esto, porque despues se va a usar en abb_destruir y no esta bueno que devuelva el valor.
-//Si yo llamo a la funcion y no hago nada con el valor que me devuelve la funcion, el compilador me va a gritar.
-void* destruir_nodo(abb_t* arbol, nodo_abb_t* nodo) {
+// Ahora destruye solo el nodo y la clave, le devuelve el dato al usuario sin destruir.
+void* destruir_nodo(nodo_abb_t* nodo) {
     void* dato_aux = nodo->valor;
     free(nodo->clave);
-    if (arbol->destruir_dato) {
-        arbol->destruir_dato(nodo->dato);
-    }
     free(nodo);
     return dato_aux;
 }
@@ -116,12 +112,15 @@ nodo_abb_t* buscar_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
 }
 
 //Destruye nodos en recorrido postorder.
-void destruir_post_order(nodo_abb_t* raiz, abb_destruir_dato_t destruir_dato){
+void destruir_post_order(nodo_abb_t* nodo, abb_t* arbol){
 	if(!raiz) return;
 	//Primero trato la rama izquierda, luego la derecha, y por ultimo la raiz.
-	destruir_post_order(raiz->izq,destruir_dato) //Aca le podemos pasar destruir_nodo creo
-	destruir_post_order(raiz->der,destruir_dato);
-	destruir_post_order(raiz,destruir_dato);
+	destruir_post_order(raiz->izq, arbol);
+	destruir_post_order(raiz->der, arbol);
+    void* dato_aux = destruir_nodo(nodo);
+    if (arbol->destruir_dato) {
+        arbol->destruir_dato(dato_aux);
+    }
 }
 
 /* ******************************************************************
@@ -142,15 +141,15 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     //abb_guardar estaria funcionando como una especie de wrapper para abb_insertar
     if (arbol == NULL) return false;
     if (arbol->cantidad == 0) {
-        nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
+        nodo_abb_t *nodo_aux = crear_nodo(clave, dato);
         if (nodo_aux == NULL) return false;
         arbol->raiz = nodo_aux;
         arbol->cantidad++;
         return true;
+    } else {  //Supongo que esto es cuando arbol->cantidad != 0, sino estarias incrementado 2 veces la cantidad.
+        return abb_insertar(arbol, arbol->raiz, clave, dato);
     }
-    else{  //Supongo que esto es cuando arbol->cantidad != 0, sino estarias incrementado 2 veces la cantidad.
-    	return abb_insertar(arbol, arbol->raiz, clave, dato);
-    }
+}
 
 
 void *abb_obtener(const abb_t *arbol, const char *clave) {
@@ -190,7 +189,10 @@ INORDER*/
 void iterador_inorder(nodo_abb_t* nodo, visitar,extra){
 	if(!nodo) return;
 	iterador_inorder(nodo->izq,visitar,extra);
-	if(visitar) visitar(nodo->clave,nodo->valor,extra);
+    // No hace falta chequear si visitar no es NULL, ya lo chequeaste en abb_in_order
+    if (!visitar(nodo->clave,nodo->valor,extra)) {
+        return;
+    }
 	iterador_inorder(nodo->der,visitar,extra);
 }
 
