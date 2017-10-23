@@ -72,8 +72,15 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
         }
         else {
             nodo_abb_t* nodo_aux = crear_nodo(clave, valor);
+<<<<<<< HEAD
             if (!nodo_aux) return false;
             nodo->der = nodo_aux;
+=======
+            if (nodo_aux == NULL) return false;
+
+            nodo->der = nodo_aux;
+            arbol->cantidad++;
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
         }
     }
         // Si me tengo que mover a la izq.
@@ -85,15 +92,26 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
             nodo_abb_t* nodo_aux = crear_nodo(clave, valor);
             if (nodo_aux == NULL) return false;
 
+<<<<<<< HEAD
             nodo->izq = nodo_aux;  //Habias puesto nodo->der, cuando hay que crear un nodo->izq.
         }
     }
     arbol->cantidad++; //Pongo esto aca ya que se repetia en los 2 else.
+=======
+            nodo->der = nodo_aux;
+            arbol->cantidad++;
+        }
+    }
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
 }
 
 // Devuelve el nodo y no el valor asi despues puedo usar la funcion para el abb_borrar
 nodo_abb_t* buscar_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
     if (arbol->cmp(clave, nodo->clave) == 0) return nodo;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
     else if (arbol->cmp(clave, nodo->clave) > 0) {
         if (nodo->der != NULL) {
             return buscar_por_clave(arbol, nodo->der, clave);
@@ -112,6 +130,7 @@ nodo_abb_t* buscar_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
     }
 }
 
+<<<<<<< HEAD
 //Destruye nodos en recorrido postorder.
 void destruir_post_order(nodo_abb_t* raiz, abb_destruir_dato_t destruir_dato){
 	if(!raiz) return;
@@ -121,6 +140,8 @@ void destruir_post_order(nodo_abb_t* raiz, abb_destruir_dato_t destruir_dato){
 	destruir_post_order(raiz,destruir_dato);
 }
 
+=======
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
 /* ******************************************************************
  *                       PRIMITIVAS DEL ABB                         *
  * *****************************************************************/
@@ -138,6 +159,7 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     //abb_guardar estaria funcionando como una especie de wrapper para abb_insertar
     if (arbol == NULL) return false;
+<<<<<<< HEAD
     if (arbol->cantidad == 0) {
         nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
         if (nodo_aux == NULL) return false;
@@ -148,25 +170,48 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     else{  //Supongo que esto es cuando arbol->cantidad != 0, sino estarias incrementado 2 veces la cantidad.
     	return abb_insertar(arbol, arbol->raiz, clave, dato);
     }
+=======
+
+    if (arbol->cantidad == 0) {
+        nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
+        if (nodo_aux == NULL) return false;
+
+        arbol->raiz = nodo_aux;
+        arbol->cantidad++;
+
+        return true;
+    }
+    return abb_insertar(arbol, arbol->raiz, clave, dato);
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
 }
 
 void *abb_obtener(const abb_t *arbol, const char *clave) {
     if (!arbol || arbol->cantidad == 0) return NULL;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
     return buscar_por_clave(arbol, arbol->raiz, clave);
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
     if (!arbol || arbol->cantidad == 0) return false;
+<<<<<<< HEAD
     return buscar_por_clave(arbol, arbol->raiz, clave) != NULL;
 }
 
 size_t abb_cantidad(abb_t* arbol){
 	return arbol->cantidad;
+=======
+
+    return buscar_por_clave(arbol, arbol->raiz, clave) != NULL;
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
 }
 
 void abb_destruir(abb_t *arbol) {
     // Se destruye al arbol usando internamente un recorrido post-order para asi eliminar siempre hojas y no tener que
     // lidiar con problemas de nodos con hijos y cosas asi.
+<<<<<<< HEAD
     if(!arbol) return;
     destruir_post_order(arbol->raiz, arbol->destruir_dato);
     free(arbol);
@@ -200,3 +245,7 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 
 
 
+=======
+
+}
+>>>>>>> 58e3206d16c26deca277c07facde46b2b9e17535
