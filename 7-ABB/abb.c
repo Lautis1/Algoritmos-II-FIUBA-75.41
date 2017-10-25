@@ -81,6 +81,7 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
             nodo->der = nodo_aux;
             if (nodo_aux == NULL) return false;
             nodo->der = nodo_aux;
+            arbol->cantidad++;
         }
     }
         // Si me tengo que mover a la izq.
@@ -91,10 +92,10 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
         else {
             nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
             if (nodo_aux == NULL) return false;
-            nodo->izq = nodo_aux;  //Habias puesto nodo->der, cuando hay que crear un nodo->izq.
+            nodo->izq = nodo_aux;
+            arbol->cantidad++;
         }
     }
-    arbol->cantidad++;
     return true;
 }
 
@@ -369,6 +370,7 @@ bool abb_iter_in_al_final(const abb_iter_t *iter){
 
 //Devuelve la clave a la que apunta el iterador.
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
+    if (pila_esta_vacia(iter->pila)) return NULL;
 
 	return((nodo_abb_t*)pila_ver_tope(iter->pila))->clave;
 }
