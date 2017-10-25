@@ -142,7 +142,7 @@ size_t cantidad_de_hijos(nodo_abb_t* nodo) {
 //Intercambia el nodo que va a tomar el lugar del borrado con el borrado.
 void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
 	
-	const char* clave_2 = nodo2->clave;
+	char* clave_2 = nodo2->clave;
 	void* valor_2 = nodo2->valor;
 	nodo2->clave = nodo1->clave;
 	nodo2->valor = nodo1->valor;
@@ -365,14 +365,14 @@ bool abb_iter_in_avanzar(abb_iter_t *iter) {
 //final del arbol o no.
 bool abb_iter_in_al_final(const abb_iter_t *iter){
 	
-	return(pila_esta_vacia(iter->pila));
+	return(iter->actual == NULL);
 }
 
 //Devuelve la clave a la que apunta el iterador.
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-    if (pila_esta_vacia(iter->pila)) return NULL;
+    if (iter->actual == NULL) return NULL;
 
-	return((nodo_abb_t*)pila_ver_tope(iter->pila))->clave;
+	return iter->actual->clave;
 }
 
 //Destruye el iterador y su pila.
