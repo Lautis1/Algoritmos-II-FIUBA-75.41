@@ -11,7 +11,7 @@
  * *****************************************************************/
 
 typedef struct nodo_abb{
-	char* clave;
+	const char* clave;
 	void* valor;
 	struct nodo_abb* izq;
 	struct nodo_abb* der;
@@ -33,7 +33,7 @@ struct abb_iter{
 /* ******************************************************************
  *                       FUNCIONES PRIVADAS                         *
  * *****************************************************************/
-nodo_abb_t* crear_nodo(char* clave, void* valor) {
+nodo_abb_t* crear_nodo(const char* clave, void* valor) {
 
 	nodo_abb_t* nodo = malloc(sizeof(nodo_abb_t));
 	if(!nodo){
@@ -56,7 +56,7 @@ nodo_abb_t* crear_nodo(char* clave, void* valor) {
 void* destruir_nodo(nodo_abb_t* nodo) {
 
     void* dato_aux = nodo->valor;
-    free(nodo->clave);
+    free((char*)nodo->clave);
     free(nodo);
     return dato_aux;
 }
@@ -76,7 +76,7 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
             return abb_insertar(arbol, nodo->der, clave, dato);
         }
         else {
-            nodo_abb_t* nodo_aux = crear_nodo(clave, valor);
+            nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
             if (!nodo_aux) return false;
             nodo->der = nodo_aux;
             if (nodo_aux == NULL) return false;
@@ -89,7 +89,7 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
             return abb_insertar(arbol, nodo->izq, clave, dato);
         }
         else {
-            nodo_abb_t* nodo_aux = crear_nodo(clave, valor);
+            nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
             if (nodo_aux == NULL) return false;
             nodo->izq = nodo_aux;  //Habias puesto nodo->der, cuando hay que crear un nodo->izq.
         }
@@ -100,12 +100,12 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
 
 
 // Devuelve el nodo y no el valor asi despues puedo usar la funcion tanto para abb_borrar como para obtener.
-nodo_abb_t* buscar_nodo_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
+nodo_abb_t* buscar_nodo_por_clave(const abb_t* arbol, nodo_abb_t* nodo, const char* clave) {
 
     if (arbol->cmp(clave, nodo->clave) == 0) return nodo;
     else if (arbol->cmp(clave, nodo->clave) > 0) {
         if (nodo->der != NULL) {
-            return buscar_por_clave(arbol, nodo->der, clave);
+            return buscar_nodo_por_clave(arbol, nodo->der, clave);
         }
         else {
             return NULL;
@@ -113,7 +113,7 @@ nodo_abb_t* buscar_nodo_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
     }
     else {
         if (nodo->izq != NULL) {
-            return buscar_por_clave(arbol, nodo->izq, clave);
+            return buscar_nodo_por_clave(arbol, nodo->izq, clave);
         }
         else {
             return NULL;
@@ -123,7 +123,7 @@ nodo_abb_t* buscar_nodo_por_clave(abb_t* arbol, nodo_abb_t* nodo, char* clave) {
 
 void destruir_post_order(nodo_abb_t* nodo, abb_destruir_dato_t destruir_dato){
 	
-	if(!raiz) return;
+	if(!nodo) return;
 	destruir_post_order(nodo->izq,destruir_dato);
 	destruir_post_order(nodo->der,destruir_dato);
     void* dato = destruir_nodo(nodo);
@@ -131,7 +131,7 @@ void destruir_post_order(nodo_abb_t* nodo, abb_destruir_dato_t destruir_dato){
 
 }
 //Devuelve la cantidad de hijos de un nodo. 0 si es una "hoja"
-int cantidad_de_hijos(nodo_abb_t* nodo) {
+size_t cantidad_de_hijos(nodo_abb_t* nodo) {
 
     if (nodo->izq && nodo->der) return 2;
     if (nodo->izq || nodo->der) return 1;
@@ -141,7 +141,7 @@ int cantidad_de_hijos(nodo_abb_t* nodo) {
 //Intercambia el nodo que va a tomar el lugar del borrado con el borrado.
 void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
 	
-	char* clave_2 = nodo2->clave;
+	const char* clave_2 = nodo2->clave;
 	void* valor_2 = nodo2->valor;
 	nodo2->clave = nodo1->clave;
 	nodo2->valor = nodo1->valor;
@@ -152,13 +152,61 @@ void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
 // Pre: nodo existe
 nodo_abb_t* buscar_nodo_minimo(nodo_abb_t* nodo){
 	
-	nodo_abb_t* nodo_actual = nodo;
-	while(nodo_actual->izq){
-		nodo_actual = nodo_actual->izq;
-	}
-	return nodo_actual;
+	if (nodo == NULL) return NULL;
+    buscar_nodo_minimo(nodo->izq);
+    return nodo;
+}
+// Pre: el nodo buscado existe y tiene un padre.
+// Busca al padre del nodo correspondiente a la clave pasada por parametro.
+nodo_abb_t* buscar_nodo_padre(abb_t* arbol, nodo_abb_t* nodo, const char* clave) {
+    if (arbol->cmp(clave, nodo->clave) < 0) {
+        if (arbol->cmp(clave, nodo->izq->clave) == 0) {
+            return nodo;
+        }
+        return buscar_nodo_padre(arbol, nodo->izq, clave);
+    }
+    else {
+        if (arbol->cmp(clave, nodo->der->clave) == 0) {
+            return nodo;
+        }
+        return buscar_nodo_padre(arbol, nodo->der, clave);
+    }
 }
 
+bool es_raiz(abb_t* arbol, nodo_abb_t* nodo) {
+    return arbol->cmp(arbol->raiz->clave, nodo->clave) == 0;
+}
+
+// Funcion generica de borrar, se usa para todos los casos. (0,1 y 2 hojas)
+void* borrar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, nodo_abb_t* reemplazo, nodo_abb_t* padre) {
+    if (padre != NULL) {
+        if (padre->izq != NULL && arbol->cmp(padre->izq->clave, clave) == 0) {
+            padre->izq = reemplazo;
+        } else { // Si llega aca, padre->izq no existe o no es el nodo buscado, entonces padre->der debe ser el nodo buscado.
+            padre->der = reemplazo;
+        }
+    } else { // Si es raiz
+        arbol->raiz = reemplazo;
+    }
+    void* dato_aux = destruir_nodo(nodo);
+    arbol->cantidad--;
+    return dato_aux;
+}
+
+void* borrar_dos_hijos(abb_t* arbol, const char* clave, nodo_abb_t* nodo) {
+    nodo_abb_t* nodo_sucesor = buscar_nodo_minimo(nodo->der);
+    // Busco el padre ahora antes de swapear porque despues no lo voy a poder encontrar
+    // debido a la alteracion momentanea del invariante del abb.
+    nodo_abb_t* padre_sucesor = buscar_nodo_padre(arbol, arbol->raiz, nodo_sucesor->clave);
+    swapear_nodos(nodo, nodo_sucesor);
+    // Al ser minimo va a tener o 0 o 1 hijo, por lo que no tiene sentido chequear si tiene 2 hijos.
+    if (nodo_sucesor->izq != NULL) {
+        return borrar(arbol, nodo_sucesor, clave, nodo_sucesor->izq, padre_sucesor);
+    } else if (nodo_sucesor->der != NULL){
+        return borrar(arbol, nodo_sucesor, clave, nodo_sucesor->der, padre_sucesor);
+    }
+    return borrar(arbol, nodo_sucesor, clave, NULL, padre_sucesor);
+}
 
 /* ******************************************************************
  *                       PRIMITIVAS DEL ABB                         *
@@ -192,14 +240,14 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
 void *abb_obtener(const abb_t *arbol, const char *clave) {
 
     if (!arbol || arbol->cantidad == 0) return NULL;
-    nodo_abb_t* nodo_aux = buscar_por_clave(arbol, arbol->raiz, clave);
+    nodo_abb_t* nodo_aux = buscar_nodo_por_clave(arbol, arbol->raiz, clave);
     return (nodo_aux == NULL ? NULL : nodo_aux->valor);
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
     
     if (!arbol || arbol->cantidad == 0) return false;
-    return buscar_por_clave(arbol, arbol->raiz, clave) != NULL;
+    return buscar_nodo_por_clave(arbol, arbol->raiz, clave) != NULL;
 }
 
 size_t abb_cantidad(abb_t* arbol){
@@ -217,22 +265,33 @@ void abb_destruir(abb_t *arbol) {
 
 void *abb_borrar(abb_t *arbol, const char *clave) {
 	
-	if(!arbol) return NULL;
-	nodo_abb_t* nodo_a_borrar = buscar_nodo_por_clave(arbol, clave);
+	if(!arbol || arbol->cantidad == 0) return NULL;
+	nodo_abb_t* nodo_a_borrar = buscar_nodo_por_clave(arbol,arbol->raiz, clave);
     if (nodo_a_borrar == NULL) return NULL;
-	if(cantidad_de_hijos(nodo_a_borrar)==0) {
-        void* dato_aux = destruir_nodo(nodo_a_borrar);
+    nodo_abb_t* padre = NULL;
+    size_t cantidad_hijos = cantidad_de_hijos(nodo_a_borrar);
+	if(cantidad_hijos == 0) {
+        if (!es_raiz(arbol, nodo_a_borrar)) {
+            padre = buscar_nodo_padre(arbol, arbol->raiz, clave);
+        }
+        // Si es raiz entonces padre va a ser NULL.
+        return borrar(arbol,nodo_a_borrar, clave, NULL, padre);
     }
-	else if(cantidad_de_hijos(nodo_a_borrar)==1){
-		if(nodo_a_borrar->izq || !nodo_a_borrar->der){
-			swapear_nodos(nodo_a_borrar,nodo_a_borrar->izq); //Los swapeo y el nodo a borrar
-
-		}
-
+	else if(cantidad_hijos == 1) {
+        if (!es_raiz(arbol, nodo_a_borrar)) {
+            padre = buscar_nodo_padre(arbol, arbol->raiz, clave);
+        }
+		if (nodo_a_borrar->izq == NULL) {
+            return borrar(arbol,nodo_a_borrar, clave, nodo_a_borrar->der,padre);
+        }
+        return borrar(arbol,nodo_a_borrar, clave, nodo_a_borrar->izq, padre);
 	}
-	
-
+    else {
+        return borrar_dos_hijos(arbol, clave, nodo_a_borrar);
+    }
 }
+
+
 
 /* ******************************************************************
  *                 IMPLEMENTACION ITERADOR INTERNO                  *
@@ -245,9 +304,9 @@ INORDER*/
 void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra){
 	
 	if(!nodo) return;
-	if(nodo->izq) iterador_inorder(nodo->izq,visitar,extra);
-	visitar(nodo->clave,nodo->valor,extra);
-	if(nodo->der) iterador_inorder(nodo->der,visitar,extra);
+	iterador_inorder(nodo->izq,visitar,extra);
+	if (!visitar(nodo->clave,nodo->valor,extra)) return;
+	iterador_inorder(nodo->der,visitar,extra);
 }
 
 
