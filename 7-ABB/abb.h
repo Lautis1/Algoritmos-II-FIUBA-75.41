@@ -2,6 +2,7 @@
 #define ABB_H
 #include <stdbool.h>
 #include <stddef.h>
+#include "pila.h"
 
 /* ******************************************************************
  *                DEFINICION DE LOS TIPOS DE DATOS
