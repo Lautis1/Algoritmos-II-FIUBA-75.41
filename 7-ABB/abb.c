@@ -11,18 +11,19 @@
  * *****************************************************************/
 
 typedef struct nodo_abb{
-	const char* clave;
-	void* valor;
-	struct nodo_abb* izq;
-	struct nodo_abb* der;
+    const char* clave;
+    void* valor;
+    struct nodo_abb* izq;
+    struct nodo_abb* der;
 }nodo_abb_t;
 
 struct abb{
-	nodo_abb_t* raiz;
-	abb_comparar_clave_t cmp;
-	abb_destruir_dato_t destruir_dato;
-	size_t cantidad;
+    nodo_abb_t* raiz;
+    abb_comparar_clave_t cmp;
+    abb_destruir_dato_t destruir_dato;
+    size_t cantidad;
 };
+
 
 struct abb_iter{
 	abb_t* arbol;
@@ -141,8 +142,8 @@ size_t cantidad_de_hijos(nodo_abb_t* nodo) {
 
 //Intercambia el nodo que va a tomar el lugar del borrado con el borrado.
 void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
-	
-	char* clave_2 = nodo2->clave;
+
+	const char* clave_2 = nodo2->clave;
 	void* valor_2 = nodo2->valor;
 	nodo2->clave = nodo1->clave;
 	nodo2->valor = nodo1->valor;
@@ -152,10 +153,12 @@ void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
 
 // Pre: nodo existe
 nodo_abb_t* buscar_nodo_minimo(nodo_abb_t* nodo){
-	
-	if (nodo == NULL) return NULL;
-    buscar_nodo_minimo(nodo->izq);
-    return nodo;
+
+    nodo_abb_t* act = nodo;
+    while (act->izq != NULL) {
+        act = act->izq;
+    }
+    return act;
 }
 // Pre: el nodo buscado existe y tiene un padre.
 // Busca al padre del nodo correspondiente a la clave pasada por parametro.
