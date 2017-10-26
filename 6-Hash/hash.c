@@ -53,11 +53,11 @@ size_t funcion_hash(const char *str) {
 
 //Llama a la funcion destruir_dato y elimina y libera la memoria
 //del item pasado por parametro.
-void destruir(hash_item_t* item, const hash_t *hash) {
+void destruir(hash_item_t* item, hash_destruir_dato_t destruir_dato) {
     
     if (item != NULL) {
-        if (hash->destruir_dato) {
-            hash->destruir_dato(item->dato);
+        if (destruir_dato) {
+            destruir_dato(item->dato);
         }
         free(item->clave);
     }
@@ -206,7 +206,7 @@ void *hash_borrar(hash_t *hash, const char *clave) {
     else{
     	hash_item_t* aux = lista_iter_borrar(iter);
     	dato = aux->dato;
-    	destruir(aux,hash);
+    	destruir(aux,NULL);
     	hash->cantidad--;
     }
     lista_iter_destruir(iter);
@@ -256,7 +256,7 @@ void hash_destruir(hash_t *hash) {
     for (int i = 0; i < hash->tamanio; i++) {
         while (!lista_esta_vacia(hash->tabla[i])) {
             hash_item_t *item_aux = lista_borrar_primero(hash->tabla[i]);
-            destruir(item_aux, hash);
+            destruir(item_aux, hash->destruir_dato);
         }
         lista_destruir(hash->tabla[i],NULL);
     }
