@@ -1,12 +1,11 @@
 #define _POSIX_C_SOURCE 200809L
-
 #include "hash.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include "lista.h"
 
-#define TAMANIO_INICIAL 64
+#define TAMANIO_INICIAL 61
 #define MAX_FACTOR_REDIM 2
 #define MIN_FACTOR_REDIM 0.3
 #define FACTOR_REDIM 2
@@ -51,7 +50,7 @@ size_t funcion_hash(const char *str) {
     return hash;
 }
 
-void destruir(hash_item_t* item, hash_t *hash) {
+void destruir(hash_item_t* item, const hash_t *hash) {
     if (item != NULL) {
         if (hash->destruir_dato) {
             hash->destruir_dato(item->dato);
@@ -64,26 +63,20 @@ void destruir(hash_item_t* item, hash_t *hash) {
 //Pre: Hash fue creado
 //Post: Devuelve el nodo del hash que contiene la clave buscada, NULL en caso de que no se haya encontrado
 // Si borrar_nodo_lista es true se borra el nodo de la lista enlazada que contiene al nodo del hash buscado
-hash_item_t *busqueda_item_en_hash(const hash_t *hash, const char *clave, bool borrar_item_lista) {
+lista_iter_t *busqueda_item_en_hash(const hash_t *hash, const char *clave) {
     
     size_t indice_busqueda = funcion_hash(clave) % hash->tamanio;
-    lista_iter_t *iterador_de_busqueda = lista_iter_crear(hash->tabla[indice_busqueda]);
-    if (iterador_de_busqueda == NULL) return NULL;
-    while (!lista_iter_al_final(iterador_de_busqueda)) {
-        hash_item_t* item = lista_iter_ver_actual(iterador_de_busqueda);
+    lista_iter_t *iter = lista_iter_crear(hash->tabla[indice_busqueda]);
+    if (iter == NULL) return NULL;
+    while (!lista_iter_al_final(iter)) {
+        hash_item_t* item = lista_iter_ver_actual(iter);
         if (strcmp(clave, item->clave) == 0) {
             break;
         }
-        lista_iter_avanzar(iterador_de_busqueda);
+        lista_iter_avanzar(iter);
     }
-    hash_item_t *item_aux;
-    if (borrar_item_lista) {
-        item_aux = lista_iter_borrar(iterador_de_busqueda);
-    } else { // En caso de que no exista el item, entonces item_aux sera NULL
-        item_aux = lista_iter_ver_actual(iterador_de_busqueda);
-    }
-    lista_iter_destruir(iterador_de_busqueda);
-    return item_aux;
+
+    return iter;
 }
 
 //Recibe un par clave-valor y crea un nodo de hash con los datos recibidos
@@ -175,39 +168,45 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
 //Post: devuelve un booleano segun la condicion del guardado.
 bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
     
-    hash_item_t *item_aux = busqueda_item_en_hash(hash, clave, false); //busco si existe el item en la tabla
-    size_t indice = funcion_hash(clave) % hash->tamanio;
-    if (item_aux != NULL) {
+    if (hash->cantidad/hash->tamanio >= MAX_FACTOR_REDIM) {
+        if(!hash_redimensionar(hash, hash->tamanio * FACTOR_REDIM)) return false;
+    }
+    lista_iter_t* iter = busqueda_item_en_hash(hash, clave); //busco si existe el item en la tabla
+    if (lista_iter_ver_actual(iter)!=NULL) {
+    	hash_item_t* item_aux = lista_iter_ver_actual(iter);
         //DESTRUIR PORQUE HAY UNA LISTA EN ESA POSICION
         if (hash->destruir_dato != NULL) hash->destruir_dato(item_aux->dato);
         item_aux->dato = dato;
     } else {
-        if (hash->cantidad/hash->tamanio >= MAX_FACTOR_REDIM) {
-            if(!hash_redimensionar(hash, hash->tamanio * FACTOR_REDIM)) return false;
-        }
         hash_item_t *item_a_insertar = crear_item(clave, dato);
         if (item_a_insertar == NULL) return false;
         // Tanto si la lista esta en la posicion esta vacia como si ya tiene
         // elementos no hay diferencia, lista insertar se encarga de manejar
         // la actualizacion de punteros y demas cosas
-        if (!lista_insertar_ultimo(hash->tabla[indice], item_a_insertar)) return false;
+        lista_iter_insertar(iter, item_a_insertar);
         hash->cantidad++;
+        
     }
+    lista_iter_destruir(iter);
     return true;
 }
 
 void *hash_borrar(hash_t *hash, const char *clave) {
     
-    hash_item_t *item_aux = busqueda_item_en_hash(hash, clave, true);
-    if (item_aux == NULL) return NULL;
+    lista_iter_t* iter = busqueda_item_en_hash(hash, clave);
     if (hash->cantidad/hash->tamanio <= MIN_FACTOR_REDIM && (hash->tamanio / FACTOR_REDIM) > TAMANIO_INICIAL) {
-        if(!hash_redimensionar(hash, hash->tamanio / FACTOR_REDIM)) return NULL;
+        if(!hash_redimensionar(hash, hash->tamanio / FACTOR_REDIM)) return false;
     }
-    void *dato_aux = item_aux->dato;
-    free(item_aux->clave);
-    free(item_aux);
-    hash->cantidad--;
-    return dato_aux;
+    void* dato;
+    if(lista_iter_al_final(iter)) dato = NULL;
+    else{
+    	hash_item_t* aux = lista_iter_borrar(iter);
+    	dato = aux->dato;
+    	destruir(aux,hash);
+    	hash->cantidad--;
+    }
+    lista_iter_destruir(iter);
+    return dato;
 }
 
 
@@ -217,7 +216,10 @@ void *hash_borrar(hash_t *hash, const char *clave) {
 //de la clave en el hash.
 bool hash_pertenece(const hash_t *hash, const char *clave) {
 
-	return busqueda_item_en_hash(hash, clave, false) != NULL;
+	lista_iter_t* iter = busqueda_item_en_hash(hash,clave);
+	hash_item_t* item = lista_iter_ver_actual(iter);
+	lista_iter_destruir(iter);
+	return item!=NULL;
 }
 
 //Devuelve el valor asociado a una clave.
@@ -226,9 +228,12 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
 //no existe.
 void *hash_obtener(const hash_t *hash, const char *clave) {
     
-    hash_item_t *item = busqueda_item_en_hash(hash, clave, false);
-    if (!item) return NULL;
-    return item->dato;
+    lista_iter_t* iter = busqueda_item_en_hash(hash, clave);
+    void* dato;
+    if(lista_iter_al_final(iter)) dato = NULL;
+    else dato = ((hash_item_t*)lista_iter_ver_actual(iter))->dato;
+    lista_iter_destruir(iter);
+    return dato;
 }
 
 //Devuelve la cantidad de elementos del hash.

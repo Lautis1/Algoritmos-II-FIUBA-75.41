@@ -44,7 +44,7 @@ lista_t *lista_crear(void){
 // caso contrario.
 // Pre: la lista fue creada.
 bool lista_esta_vacia(const lista_t *lista){
-	return (lista->largo==0);
+	return (!lista->largo);
 }
 
 // Agrega un nuevo elemento en la primera posicion de la lista. 
@@ -57,14 +57,13 @@ bool lista_insertar_primero(lista_t *lista, void *dato){
 	if(!nodo) return false;
 	nodo->dato = dato;
 	if(lista_esta_vacia(lista)){
-		lista->primero = nodo;
 		lista->ultimo = nodo;
 		nodo->proximo = NULL;
 	}
 	else{
 		nodo->proximo = lista->primero;
-		lista->primero = nodo;
 	}
+	lista->primero = nodo;
 	lista->largo++;
 	return true;
 }
@@ -155,9 +154,7 @@ void lista_destruir(lista_t *lista, void destruir_dato(void *)){
 void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *extra){
 	if(lista_esta_vacia(lista)) return;
 	nodo_t* actual = lista->primero;
-	while(actual){
-		if(!visitar) return;
-		visitar(actual->dato,extra);
+	while(actual && visitar(actual->dato,extra)){
 		actual = actual->proximo;
 	}
 }
@@ -228,9 +225,12 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
 	}
 	if(!iter->anterior && iter->actual) iter->lista->primero = nodo;
 	if(iter->anterior && iter->actual) iter->anterior->proximo = nodo;
-	else {iter->lista->ultimo = nodo;}
-	iter->lista->largo++; 
+	if(!iter->actual && iter->anterior){
+		iter->lista->ultimo = nodo;
+		iter->anterior->proximo = nodo;}
+	 
 	iter->actual = nodo;
+	iter->lista->largo++;
 	return true;
 }
 
