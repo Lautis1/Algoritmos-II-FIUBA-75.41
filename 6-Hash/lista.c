@@ -239,7 +239,7 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
 // Post: Borra y devuelve un elemento de la lista, actual pasa a ser
 // el siguiente del elemento borrado. Devuelve NULL si paso el final o esta vacia.
 void *lista_iter_borrar(lista_iter_t *iter){
-	if(!iter->actual) return NULL;
+	if(iter->actual==NULL) return NULL;
 	void* dato = iter->actual->dato;
 	nodo_t* auxiliar = iter->actual;
 	if(!iter->anterior) iter->lista->primero = iter->actual->proximo;

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "lista.h"
 
-#define TAMANIO_INICIAL 61
+#define TAMANIO_INICIAL 60
 #define MAX_FACTOR_REDIM 2
 #define MIN_FACTOR_REDIM 0.3
 #define FACTOR_REDIM 2
@@ -15,7 +15,7 @@
  *                DEFINICION DE LOS TIPOS DE DATOS                 *
  ******************************************************************/
 
-typedef struct hash_item {
+typedef struct hash_item {  //Le cambiamos el nombre, antes era nodo_hash_t.
     char *clave;
     void *dato;
 } hash_item_t;
@@ -41,6 +41,7 @@ struct hash_iter {
 //ALGORITMO DE HASH BY DJB2
 
 size_t funcion_hash(const char *str) {
+    
     size_t hash = 5381;
     int c;
     while ((c = *str++)) {
@@ -50,7 +51,10 @@ size_t funcion_hash(const char *str) {
     return hash;
 }
 
+//Llama a la funcion destruir_dato y elimina y libera la memoria
+//del item pasado por parametro.
 void destruir(hash_item_t* item, const hash_t *hash) {
+    
     if (item != NULL) {
         if (hash->destruir_dato) {
             hash->destruir_dato(item->dato);
@@ -61,8 +65,7 @@ void destruir(hash_item_t* item, const hash_t *hash) {
 }
 
 //Pre: Hash fue creado
-//Post: Devuelve el nodo del hash que contiene la clave buscada, NULL en caso de que no se haya encontrado
-// Si borrar_nodo_lista es true se borra el nodo de la lista enlazada que contiene al nodo del hash buscado
+//Post: Devuelve el iterador sobre la lista contenida en cada item, NULL en caso de que no se haya encontrado.
 lista_iter_t *busqueda_item_en_hash(const hash_t *hash, const char *clave) {
     
     size_t indice_busqueda = funcion_hash(clave) % hash->tamanio;
@@ -75,12 +78,11 @@ lista_iter_t *busqueda_item_en_hash(const hash_t *hash, const char *clave) {
         }
         lista_iter_avanzar(iter);
     }
-
-    return iter;
+	return iter;
 }
 
-//Recibe un par clave-valor y crea un nodo de hash con los datos recibidos
-//Post: Devuelve dicho nodo
+//Recibe un par clave-valor y crea un item de hash con los datos recibidos
+//Post: Devuelve dicho item.
 hash_item_t *crear_item(const char *clave, void *dato) {
 
     hash_item_t *item_nue = malloc(sizeof(hash_item_t));
@@ -92,7 +94,7 @@ hash_item_t *crear_item(const char *clave, void *dato) {
     return item_nue;
 }
 
-//Encuentra la proxima lista que contiene al menos a un nodo de hash dentro
+//Encuentra la proxima lista que contiene al menos a un item de hash dentro
 void encontrar_proxima_lista_no_vacia(hash_iter_t *hash_iter) {
 
     while (lista_esta_vacia(hash_iter->hash->tabla[hash_iter->pos_actual]) && !hash_iter_al_final(hash_iter)) {
@@ -100,7 +102,7 @@ void encontrar_proxima_lista_no_vacia(hash_iter_t *hash_iter) {
     }
 }
 
-//Crea una arreglo de tamaño: tamanio_tabla de elementos del tipo lista_t**
+//Crea una arreglo de tamaño 'tamanio_tabla' de elementos del tipo lista_t**
 //Post: Devuelve dicha tabla, NULL en caso de que algun malloc haya fallado o el tamaño recibido sea 0
 lista_t** hash_crear_tabla(size_t tamanio_tabla) {
     
@@ -127,8 +129,9 @@ bool hash_redimensionar(hash_t *hash, size_t nuevo_tamanio) {
         while (!lista_esta_vacia(hash->tabla[j])) {
             hash_item_t *item = lista_borrar_primero(hash->tabla[j]);
             size_t indice = funcion_hash(item->clave) % nuevo_tamanio;
-            lista_insertar_ultimo(tabla_nueva[indice], item);
+            lista_insertar_ultimo(tabla_nueva[indice],item);
         }
+        
         lista_destruir(hash->tabla[j], NULL);
     }
     free(hash->tabla);
@@ -173,8 +176,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
     }
     lista_iter_t* iter = busqueda_item_en_hash(hash, clave); //busco si existe el item en la tabla
     if (lista_iter_ver_actual(iter)!=NULL) {
-    	hash_item_t* item_aux = lista_iter_ver_actual(iter);
-        //DESTRUIR PORQUE HAY UNA LISTA EN ESA POSICION
+    	hash_item_t* item_aux = lista_iter_ver_actual(iter); //DESTRUIR PORQUE HAY UNA LISTA EN ESA POSICION
         if (hash->destruir_dato != NULL) hash->destruir_dato(item_aux->dato);
         item_aux->dato = dato;
     } else {
@@ -190,13 +192,15 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
     lista_iter_destruir(iter);
     return true;
 }
-
+//Busca el item en el hash y lo borra, devolviendo su dato.
+//Pre: el hash fue creado.
+//Post: se devuelve el dato del item borrado.
 void *hash_borrar(hash_t *hash, const char *clave) {
     
-    lista_iter_t* iter = busqueda_item_en_hash(hash, clave);
     if (hash->cantidad/hash->tamanio <= MIN_FACTOR_REDIM && (hash->tamanio / FACTOR_REDIM) > TAMANIO_INICIAL) {
-        if(!hash_redimensionar(hash, hash->tamanio / FACTOR_REDIM)) return false;
+        if(!hash_redimensionar(hash, hash->tamanio / FACTOR_REDIM)) return NULL;
     }
+    lista_iter_t* iter = busqueda_item_en_hash(hash, clave);
     void* dato;
     if(lista_iter_al_final(iter)) dato = NULL;
     else{
@@ -208,7 +212,6 @@ void *hash_borrar(hash_t *hash, const char *clave) {
     lista_iter_destruir(iter);
     return dato;
 }
-
 
 //Chequea si la clave pertenece al hash.
 //Pre: el hash fue creado.
