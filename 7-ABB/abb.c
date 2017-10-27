@@ -34,6 +34,7 @@ struct abb_iter{
 /* ******************************************************************
  *                       FUNCIONES PRIVADAS                         *
  * *****************************************************************/
+//Crea un nodo para el ABB y lo devuelve.
 nodo_abb_t* crear_nodo(const char* clave, void* valor) {
 
 	nodo_abb_t* nodo = malloc(sizeof(nodo_abb_t));
@@ -61,7 +62,7 @@ void* destruir_nodo(nodo_abb_t* nodo) {
     free(nodo);
     return dato_aux;
 }
-
+//Funcion auxiliar para utilizar en abb_guardar
 bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato) {
 
     // Ya se chequeo si el arbol existe en abb_guardar, no hace falta revisar de nuevo.
@@ -123,6 +124,7 @@ nodo_abb_t* buscar_nodo_por_clave(const abb_t* arbol, nodo_abb_t* nodo, const ch
     }
 }
 
+//Recorre en postorder el arbol y va destruyendo los nodos.
 void destruir_post_order(nodo_abb_t* nodo, abb_destruir_dato_t destruir_dato){
 	
 	if(!nodo) return;
@@ -176,7 +178,7 @@ nodo_abb_t* buscar_nodo_padre(abb_t* arbol, nodo_abb_t* nodo, const char* clave)
         return buscar_nodo_padre(arbol, nodo->der, clave);
     }
 }
-
+//Devuelve true si el nodo pasado por parametro es la raiz del arbol.
 bool es_raiz(abb_t* arbol, nodo_abb_t* nodo) {
     return arbol->cmp(arbol->raiz->clave, nodo->clave) == 0;
 }
@@ -196,7 +198,7 @@ void* borrar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, nodo_abb_t* reem
     arbol->cantidad--;
     return dato_aux;
 }
-
+//Funcion auxiliar para borrar, se usa para borrar los nodos que tengan 2 hijos.
 void* borrar_dos_hijos(abb_t* arbol, const char* clave, nodo_abb_t* nodo) {
     nodo_abb_t* nodo_sucesor = buscar_nodo_minimo(nodo->der);
     // Busco el padre ahora antes de swapear porque despues no lo voy a poder encontrar
@@ -215,7 +217,8 @@ void* borrar_dos_hijos(abb_t* arbol, const char* clave, nodo_abb_t* nodo) {
 /* ******************************************************************
  *                       PRIMITIVAS DEL ABB                         *
  * *****************************************************************/
-
+//Crea un ABB.
+//Devuelve el abb vacio.
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 	
 	abb_t* arbol = malloc(sizeof(abb_t));
@@ -227,6 +230,9 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 	return arbol;
 }
 
+//Guarda un par (clave,valor) en el abb.
+//Pre: el abb fue creado.
+//Post: devuelve un booleano si el guardado es satisfactorio.
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
 
     if (arbol == NULL) return false;
@@ -241,6 +247,9 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     }
 }
 
+//Dado un arbol, devuelve el valor de un nodo segun su clave.
+//Pre: el abb fue creado.
+//Post: Devuelve el valor del nodo.
 void *abb_obtener(const abb_t *arbol, const char *clave) {
 
     if (!arbol || arbol->cantidad == 0) return NULL;
@@ -248,17 +257,20 @@ void *abb_obtener(const abb_t *arbol, const char *clave) {
     return (nodo_aux == NULL ? NULL : nodo_aux->valor);
 }
 
+//Dado un arbol y una clave, devuelve un booleano si
+//existe un nodo con esa clave.
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
     
     if (!arbol || arbol->cantidad == 0) return false;
     return buscar_nodo_por_clave(arbol, arbol->raiz, clave) != NULL;
 }
 
+//Dado un arbol, devuelve la cantidad de nodos que tiene.
 size_t abb_cantidad(abb_t* arbol){
 	
 	return arbol->cantidad;
 }
-
+//Destruye el abb.
 void abb_destruir(abb_t *arbol) {
 
     // Se destruye al arbol usando internamente un recorrido post-order para asi eliminar siempre hojas.
@@ -267,6 +279,9 @@ void abb_destruir(abb_t *arbol) {
     free(arbol);
 }
 
+//Borra del abb el nodo que contenga la clave dada por parametro.
+//Pre: el abb fue creado.
+//Post: devuelve el valor de ese nodo.
 void *abb_borrar(abb_t *arbol, const char *clave) {
 	
 	if(!arbol || arbol->cantidad == 0) return NULL;
