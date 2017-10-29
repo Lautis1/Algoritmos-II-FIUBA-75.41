@@ -44,3 +44,11 @@ size_t heap_cantidad(const heap_t *heap) {
 bool heap_esta_vacio(const heap_t *heap) {
     return heap->cantidad == 0;
 }
+
+void *heap_ver_max(const heap_t *heap) {
+    if (!heap_esta_vacio(heap)) {
+        return heap->arreglo[0];
+    }
+    return NULL;
+}
+
