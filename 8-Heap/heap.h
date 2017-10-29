@@ -1,10 +1,20 @@
 #ifndef ALGOS_HEAP_H
 #define ALGOS_HEAP_H
 
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
+/*******************************************************************
+ *                DEFINICION DE LOS TIPOS DE DATOS                 *
+ ******************************************************************/
 typedef struct heap heap_t;
 typedef int (*cmp_func_t) (const void *a, const void *b);
 
+/*******************************************************************
+*                        IMPLEMENTACION HEAP                       *
+*******************************************************************/
 // Pre: cmp es una funcion de comparacion valida.
 // Crea un heap con la funcion de comparacion pasada por parametro.
 // Post: El heap fue creado, devuelve el heap, NULL en caso de que algo haya fallado.
