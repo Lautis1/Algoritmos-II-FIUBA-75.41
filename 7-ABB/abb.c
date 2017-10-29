@@ -6,6 +6,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include "pila.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> c99729479ff53e421bee7e81f3557f99eb498d4a
 
 /* ******************************************************************
  *                CREACION DE LOS TIPOS DE DATOS                    *
@@ -323,6 +327,7 @@ INORDER*/
 //nodo.
 void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar){
 	
+<<<<<<< HEAD
 	if(!nodo || !*continuar)  return;
 	iterador_inorder(nodo->izq,visitar,extra,continuar);
 	if(*continuar){
@@ -330,6 +335,12 @@ void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void 
 		if(!*continuar) return;
 	}
 	iterador_inorder(nodo->der,visitar,extra,continuar);
+=======
+	if(!nodo) return;
+	iterador_inorder(nodo->izq,visitar,extra);
+    if (!visitar(nodo->clave,nodo->valor,extra)) return;
+    iterador_inorder(nodo->der,visitar,extra);
+>>>>>>> c99729479ff53e421bee7e81f3557f99eb498d4a
 }
 
 
