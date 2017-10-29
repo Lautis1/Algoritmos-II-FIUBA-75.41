@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "pila.h"
 
 /* ******************************************************************
  *                CREACION DE LOS TIPOS DE DATOS                    *
@@ -320,12 +321,15 @@ INORDER*/
 
 //Recorre el arbol con recorrido inorder, aplicando la funcion visitar a cada
 //nodo.
-void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra){
+void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar){
 	
-	if(!nodo) return;
-	iterador_inorder(nodo->izq,visitar,extra);
-	if (!visitar(nodo->clave,nodo->valor,extra)) return;
-	iterador_inorder(nodo->der,visitar,extra);
+	if(!nodo || !*continuar)  return;
+	iterador_inorder(nodo->izq,visitar,extra,continuar);
+	if(*continuar){
+		*continuar = visitar(nodo->clave,nodo->valor,extra);
+		if(!*continuar) return;
+	}
+	iterador_inorder(nodo->der,visitar,extra,continuar);
 }
 
 
@@ -333,7 +337,8 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 	
 	if(!arbol) return;
 	if(!visitar) return;
-	iterador_inorder(arbol->raiz,visitar,extra);
+	bool continuar = true;
+	iterador_inorder(arbol->raiz,visitar,extra,&continuar);
 }
 
 /* ******************************************************************
