@@ -88,7 +88,7 @@ void heap_sort(void* arreglo[], size_t cantidad, cmp_func_t cmp){
 
 	heapify(arreglo,cantidad,cmp);
 	for(size_t i = cantidad-1; i>0;i--){
-		swap(arreglo,0,0+i);
+		swap(arreglo,0,i);
 		cantidad--;
 		downheap(arreglo,0,cantidad,cmp);
 	}
