@@ -16,8 +16,8 @@ void prueba_crear_arbol_vacio(){
 	abb_t* arbol = abb_crear(strcmp,NULL);
 	print_test("Se creo un arbol vacio", arbol != NULL);
 	print_test("Cantidad de nodos es 0", abb_cantidad(arbol)==0);
-	print_test("Obtener devuelve NULL", abb_obtener(arbol,"clave")==false);
-	print_test("No existe ninguna clave", abb_pertenece(arbol,"clave")==false);
+	print_test("Obtener devuelve NULL", !abb_obtener(arbol,"clave"));
+	print_test("No existe ninguna clave", !abb_pertenece(arbol,"clave"));
 	abb_destruir(arbol);
 	print_test("Arbol destruido",true);
 	printf("\n");
