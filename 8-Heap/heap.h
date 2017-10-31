@@ -61,4 +61,6 @@ void *heap_desencolar(heap_t *heap);
 // Post: El arreglo pasado por parametro fue ordenado.
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp);
 
+void imprimeheap(const heap_t* heap);
+
 #endif //ALGOS_HEAP_H
