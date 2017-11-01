@@ -1,178 +1,280 @@
 #include "heap.h"
 #include "testing.h"
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include "strutil.h"
 
-int comparar(const void* dato1, const void* dato2){
-	int resultado;
-	
-	if (*(int*)dato1 > *(int*)dato2){
-		resultado = 1;	
-	}else if(*(int*)dato1 < *(int*)dato2){
-		resultado = -1;		
-	}else{
-		resultado = 0;
-	}
-	
-	return resultado;
+int comparar_enteros(void* valor1, void* valor2) {
+    int numero1 = *(int*) valor1;
+    int numero2 = *(int*) valor2;
+    return (numero1<numero2) ? -1 : (numero1 > numero2);
 }
 
-void pruebas_basicas(){
-	puts("PRUEBAS BÁSICAS");
-	heap_t* heap = heap_crear(comparar);
-	print_test("heap fue creado", heap);
-	
-	int dato1 = 3;  
-    int dato2 = 4;
-    int dato3 = 2;
-    int dato4 = 7;
-    int dato5 = -5;
-    int dato6 = 10;
-    int dato7 = 15;
-       
-    print_test("encolar dato1", heap_encolar(heap, &dato1));
-	print_test("encolar dato2", heap_encolar(heap, &dato2));
-	print_test("encolar dato3", heap_encolar(heap, &dato3));
-	print_test("encolar dato4", heap_encolar(heap, &dato4));
-	print_test("encolar dato5", heap_encolar(heap, &dato5));
-	print_test("encolar dato6", heap_encolar(heap, &dato6));
-	print_test("encolar dato7", heap_encolar(heap, &dato7));
-		
-	print_test("desencolar", heap_desencolar(heap) == &dato7);
-	print_test("desencolar", heap_desencolar(heap) == &dato6);
-	print_test("desencolar", heap_desencolar(heap) == &dato4);
-	print_test("desencolar", heap_desencolar(heap) == &dato2);
-	print_test("desencolar", heap_desencolar(heap) == &dato1);
-	print_test("desencolar", heap_desencolar(heap) == &dato3);
-	print_test("desencolar", heap_desencolar(heap) == &dato5);
-	print_test("desencolar heap vacio", heap_desencolar(heap) == NULL);
-		
-	heap_destruir(heap, NULL);
-	
-	puts("PRUEBAS heapsort");
-	
-	int* a = malloc(sizeof(int) * 10);
-	int* b = malloc(sizeof(int) * 10);
-	int* c = malloc(sizeof(int) * 10);
-	int* d = malloc(sizeof(int) * 10);
-	int* e = malloc(sizeof(int) * 10);
-	int* f = malloc(sizeof(int) * 10);
-	int* g = malloc(sizeof(int) * 10);
-	
-	*a = 8;
-	*b = 70;
-	*c = 70;
-	*d = -5;
-	*e = 40;
-	*f = 0;
-	*g = 8;
-	
-	void* arreglo[7] = {a, b, c, d, e, f, g};
-	heap_sort(arreglo, 7, comparar);
-	
-	puts("Después de ordenar");
-	for (size_t i = 0; i < 7; i++){
-		printf("posición %zu: %d \n", i, *(int*)arreglo[i]);
-	}	
-	
-	for (int i = 0; i < 7; i++){
-		free(arreglo[i]);		
-	}
-	
-	puts("PRUEBAS heap_crear_arr");
-	
-	void* arreglo2[3] = {&dato1, &dato2, &dato4};
-	//void* arreglo3[] = {};
-	void* arreglo4[1] = {&dato1};
-
-	heap_t* heap2 = heap_crear_arr(arreglo2, 3, comparar);
-	print_test("Crear heap con arr", heap2);
-	print_test("desencolar", heap_desencolar(heap2) == &dato4);
-	print_test("desencolar", heap_desencolar(heap2) == &dato2);
-	print_test("desencolar", heap_desencolar(heap2) == &dato1);
-	print_test("Esta vacio", heap_esta_vacio(heap2));
-	heap_destruir(heap2, NULL);
-	
-	/*heap_t* heap3 = heap_crear_arr(arreglo3, 0, comparar);
-	print_test("Crear heap con arr vacio", heap3);
-	print_test("desencolar heap vacio", heap_desencolar(heap3) == NULL);
-	print_test("Esta vacio", heap_esta_vacio(heap3));
-	heap_destruir(heap3, NULL);*/
-	
-	heap_t* heap4 = heap_crear_arr(arreglo4, 1, comparar);
-	print_test("Crear heap con arr de un elemento", heap4);
-	print_test("desencolar", heap_desencolar(heap4) == &dato1);
-	print_test("Esta vacio", heap_esta_vacio(heap4));
-	heap_destruir(heap4,NULL);
+bool esta_ordenado(void** elementos, cmp_func_t cmp, size_t cant) {
+    for (int i = 0; i < cant - 1; i++) {
+        if (cmp(elementos[i], elementos[i + 1]) == 1) return false;
+    }
+    return true;
 }
 
-void prueba_volumen(size_t largo){
-	puts("PRUEBA VOLUMEN");
-	heap_t* heap = heap_crear(comparar);
-	
-	size_t* numero;
-	bool ok = true;
-	size_t i;
-		
-	for(i = 0; i < largo ; i++){
-		numero = malloc(sizeof(size_t));
-		*numero = (size_t)rand () % largo;
-		ok = heap_encolar(heap, numero);
-		if (!ok) break;
-	}
-	
-	print_test("Prueba heap encolar muchos elementos", ok);
-	print_test("Cantidad elementos igual al largo", heap_cantidad(heap) == largo);
-	
-	void *ult_dato = heap_desencolar(heap);
-	for(i = 1; i < largo; i++){
-		void *dato = heap_desencolar(heap);
-		if(comparar(dato, ult_dato) > 0){ // dato > ult_dato - Esto es para verificar que desencola en orden.
-			ok = false;
-			break;
-		}
-		void *a_destruir = ult_dato;
-		ult_dato = dato;
-		free(a_destruir);
-	}
-	
-	print_test("Prueba heap desencolar muchos elementos", ok);
-	print_test("Cantidad elementos igual a 0", heap_cantidad(heap) == 0);
-	if(ult_dato){free(ult_dato);}
-	
-	heap_destruir(heap, free);	
-	
-	
-	void *arreglo[largo];
-	for(i = 0; i < largo; i++){
-		size_t *dato = malloc(sizeof(size_t));
-		*dato = (size_t)rand () % largo;
-		arreglo[i] = dato;
-	}
-	heap_t *heap_arr = heap_crear_arr(arreglo, largo, comparar);
-	
-	//Verifica que el heap fue creado correctamente.
-	ult_dato = heap_desencolar(heap_arr);
-	for(i = 1; i < largo; i++){
-		void *dato = heap_desencolar(heap_arr);
-		if(comparar(dato, ult_dato) > 0){ 
-			ok = false;
-			break;
-		}
-		void *a_destruir = ult_dato;
-		ult_dato = dato;
-		free(a_destruir);
-	}
-	
-	print_test("Heap crear arr muchos elementos", ok);
-	if(ult_dato){free(ult_dato);}
-	heap_destruir(heap_arr, free);	
+void shuffle(int *array, size_t n)
+{
+    if (n > 1)
+    {
+        size_t i;
+        for (i = 0; i < n - 1; i++)
+        {
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
+    }
 }
 
-void pruebas_heap_alumno(void){
-	pruebas_basicas();
-	prueba_volumen(1000);		
+
+void pruebas_heap_vacio() {
+    printf("\nINICIO DE PRUEBAS HEAP VACIO\n\n");
+
+    heap_t* heap = heap_crear((cmp_func_t)comparar_enteros);
+
+    print_test("El heap fue creado", heap != NULL);
+    print_test("El heap esta vacio", heap_esta_vacio(heap));
+    print_test("Heap_cantidad es cero en heap vacio", heap_cantidad(heap) == 0);
+    print_test("Heap_ver_max es NULL en heap vacio", heap_ver_max(heap) == NULL);
+    print_test("Heap desencolar en heap vacio es NULL", heap_desencolar(heap) == NULL);
+
+    heap_destruir(heap, NULL);
+
+    print_test("El heap fue destruido", true);
+}
+
+void pruebas_unitarias() {
+    printf("\nINICIO DE PRUEBAS HEAP UNITARIAS\n\n");
+
+    int entero_prueba_1 = 7541;
+
+    heap_t* heap = heap_crear((cmp_func_t)comparar_enteros);
+
+    print_test("El heap fue creado", heap != NULL);
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_1));
+    print_test("El heap no esta vacio", !heap_esta_vacio(heap));
+    print_test("Heap_cantidad es uno en heap vacio", heap_cantidad(heap) == 1);
+    print_test("Heap_ver_max es igual al unico valor encolado", heap_ver_max(heap) == &entero_prueba_1);
+    print_test("Heap desencolar devuelve el unico valor encolado", heap_desencolar(heap) == &entero_prueba_1);
+    print_test("Heap esta vacio es true luego de desencolar", heap_esta_vacio(heap));
+    print_test("Heap cantidad es cero luego de desencolar", heap_cantidad(heap) == 0);
+    print_test("Ver maximo es NULL luego de desencolar", heap_desencolar(heap) == NULL);
+
+    heap_destruir(heap, NULL);
+
+    print_test("El heap fue destruido", true);
+}
+
+void pruebas_pocos_elementos() {
+
+    printf("\nINICIO DE PRUEBAS HEAP POCOS ELEMENTOS\n\n");
+
+    int entero_prueba_2 = 542;
+    int entero_prueba_3 = -23;
+    int entero_prueba_4 = 0;
+    int entero_prueba_5 = 1000;
+    int entero_prueba_6 = 975;
+    int entero_prueba_7 = 52;
+    int entero_prueba_8 = 8;
+
+    heap_t* heap = heap_crear((cmp_func_t)comparar_enteros);
+
+    print_test("El heap fue creado", heap != NULL);
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_2));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_3));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_4));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_5));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_6));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_7));
+    print_test("Se encolo un elemento", heap_encolar(heap, &entero_prueba_8));
+
+    print_test("El heap no esta vacio", !heap_esta_vacio(heap));
+    print_test("Heap_cantidad es igual a la cantidad de elementos encolados", heap_cantidad(heap) == 7);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_5);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_5);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_6);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_6);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_2);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_2);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_7);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_7);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_8);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_8);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_4);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_4);
+    print_test("Heap_ver_max es igual al valor maximo insertado", heap_ver_max(heap) == &entero_prueba_3);
+    print_test("Heap desencolar devuelve el maximo valor encolado", heap_desencolar(heap) == &entero_prueba_3);
+
+    print_test("El heap esta vacio luego de desencolar todo", heap_esta_vacio(heap));
+    print_test("Heap cantidad es igual a 0 luego de desencolar todo", heap_cantidad(heap) == 0);
+    print_test("Ver maximo es NULL luego de desencolar", heap_desencolar(heap) == NULL);
+
+    heap_destruir(heap, NULL);
+
+    print_test("El heap fue destruido", true);
+}
+
+void pruebas_heap_volumen() {
+    printf("\nINICIO DE PRUEBAS DE VOLUMEN DE HEAP\n\n");
+
+    int array_prueba[4321];
+    for (int i = 0; i < 4321; i++) {
+        array_prueba[i] = i;
+    }
+
+    heap_t* heap = heap_crear((cmp_func_t)comparar_enteros);
+
+    print_test("El heap fue creado", heap != NULL);
+
+    int contador_errores = 0;
+    for (int i = 0; i < 4321; i++) {
+        if(!heap_encolar(heap,&array_prueba[i])) {
+            contador_errores++;
+        }
+    }
+
+    print_test("Se encolaron 4321 elementos correctamente", contador_errores == 0);
+    print_test("Heap esta vacio es falso", !heap_esta_vacio(heap));
+    print_test("Heap cantidad es igual a 4321", heap_cantidad(heap) == 4321);
+    print_test("Ver max es igual al maximo elemento encolado", heap_ver_max(heap) == &array_prueba[4320]);
+
+    contador_errores = 0;
+    for (int i = 4320; i >= 0; i--) {
+        if(heap_desencolar(heap) != &array_prueba[i]) {
+            contador_errores++;
+        }
+    }
+
+    print_test("Se desencolaron todos los elementos correctamente, manteniendo el invariante de heap", contador_errores == 0);
+    print_test("Heap esta vacio es true", heap_esta_vacio(heap));
+    print_test("Heap cantidad es igual a 0", heap_esta_vacio(heap));
+    print_test("Ver max en heap que ha sido vaciado es igual a NULL", heap_ver_max(heap) == NULL);
+    print_test("Heap desencolar en heap vaciado es NULL", heap_desencolar(heap) == NULL);
+
+    heap_destruir(heap, NULL);
+
+    print_test("El heap ha sido destruido", true);
+}
+
+void pruebas_heap_desde_arreglo() {
+    printf("\nINICIO DE PRUEBAS DE CREACION DE HEAP A PARTIR DE ARREGLO\n\n");
+
+    int array_prueba[123];
+    for (int i = 0; i < 123; i++) {
+        array_prueba[i] = i;
+    }
+
+    void* array_punteros[123];
+    for (int i = 0; i < 123; i++) {
+        array_punteros[i] = &array_prueba[i];
+    }
+
+    heap_t* heap = heap_crear_arr(array_punteros, 123, (cmp_func_t)comparar_enteros);
+
+    print_test("Se ha creado el heap a partir de un arreglo predefinido", heap != NULL);
+    print_test("Heap esta vacio es false", !heap_esta_vacio(heap));
+    print_test("La cantidad de elementos es igual a la proporcionada a la hora de crear la funcion", heap_cantidad(heap) == 123);
+    print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == *(int*)array_punteros[122]);
+
+    print_test("Se ha ordenado el arreglo pasado por parametro mediante heapsort correctamente", esta_ordenado(array_punteros, (cmp_func_t )comparar_enteros, 123));
+
+    int contador_errores = 0;
+    for (int i = 122; i >= 0; i--) {
+        if(heap_desencolar(heap) != array_punteros[i]) {
+            contador_errores++;
+        }
+    }
+
+    print_test("Se desencolaron todos los elementos y se quitaron en el orden correcto", contador_errores == 0);
+    print_test("Heap esta vacio es true", heap_esta_vacio(heap));
+    print_test("Cantidad es igual a 0 en heap vaciado", heap_cantidad(heap) == 0);
+    print_test("Desencolar en heap que ha sido vaciado es NULL", heap_desencolar(heap) == NULL);
+    print_test("Ver maximo en heap vaciado es NULL", heap_ver_max(heap) == NULL);
+
+    heap_destruir(heap, NULL);
+
+    print_test("El heap ha sido destruido", true);
+}
+
+void pruebas_heapsort() {
+
+    int enteros_orden_random[344];
+
+
+    for (int i = 0; i < 344; i++) {
+        enteros_orden_random[i] = i;
+    }
+
+    void* array_punteros_random[344];
+    for (int i = 0; i < 344; i++) {
+        array_punteros_random[i] = &enteros_orden_random[i];
+    }
+
+    char array_chars[] = {"martineselmasgrande"};
+
+    void* array_punteros_char[sizeof(array_chars)];
+    for (int i = 0; i < sizeof(array_chars); i++) {
+        array_punteros_char[i] = &array_chars[i];
+    }
+
+    int enteros_ordenados_al_reves[456];
+
+    for (int i = 0; i < 456; i++) {
+        enteros_ordenados_al_reves[i] = 455-i;
+    }
+
+    void* array_punteros_al_reves[456];
+    for (int i = 0; i < 456; i++) {
+        array_punteros_al_reves[i] = &enteros_ordenados_al_reves[i];
+    }
+
+    // Hago un shuffle de los numeros del array para que no queden en orden.
+    shuffle(enteros_orden_random, 344);
+
+    printf("\nINICIO DE PRUEBAS DE HEAPSORT\n\n");
+
+    heap_sort(array_punteros_random, 344, (cmp_func_t)comparar_enteros);
+
+    print_test("Se ordena un arreglo de enteros en orden aleatorio correctamente", esta_ordenado(array_punteros_random, (cmp_func_t )comparar_enteros, 343));
+
+    heap_sort(array_punteros_al_reves, 456, (cmp_func_t)comparar_enteros);
+
+    print_test("Se ordeno un arreglo de enteros originalmente ordenado de mayor a menor", esta_ordenado(array_punteros_al_reves, (cmp_func_t)comparar_enteros, 456));
+
+    heap_sort(array_punteros_char, sizeof(array_chars), (cmp_func_t)strcmp);
+
+    print_test("Se ordena un arreglo de chars correctamente", esta_ordenado(array_punteros_char, (cmp_func_t)strcmp, sizeof(array_chars)));
+}
+
+void pruebas_destruccion() {
+
+    printf("\nINICIO DE PRUEBAS DE DESTRUCCION\n\n");
+
+    char** array_char_pruebas = split("hola hola cosa la la la ala d ac ac kekd eadkaed ea dea d kaedk eakd kaedkaek dkaed", ' ');
+
+    heap_t* heap = heap_crear_arr((void**)array_char_pruebas, 19, (cmp_func_t)strcmp);
+
+    print_test("Se creo un heap con los valores pasados", heap != NULL);
+
+    heap_destruir(heap, free);
+
+    print_test("Se destruyo el heap y sus datos con la funcion pasada correctamente", true);
+
+    free(array_char_pruebas);
+
+}
+
+void pruebas_heap_alumno() {
+    pruebas_heap_vacio();
+    pruebas_unitarias();
+    pruebas_pocos_elementos();
+    pruebas_heap_volumen();
+    pruebas_heap_desde_arreglo();
+    pruebas_heapsort();
+    pruebas_destruccion();
 }
