@@ -90,3 +90,41 @@ bool aumenta_cont_solicitudes_recurso(hash_t* temp_recursos_solicitados, char* r
 
     return true;
 }
+
+//Imprimir posibles ip con DoS
+
+void imprimir_dos(char* direccion_ip){
+
+	if(!direccion_ip) return;
+	fprintf(stdout, "DoS: %s\n", direccion_ip);
+}
+
+//Funcion de comparacion de IPS
+//Devuelve 0 si son iguales, 1 si el primer parametro es mayor al 2do,
+//-1 si el segundo parametro es mayor al primero.
+
+int comparar_ips(char* ip_1, char* ip_2){
+
+	char** dir_ip1 = split(ip_1, '.');
+	char** dir_ip2 = split(ip_2, '.');
+	int retorno;
+	for(int i=0; i<4; i++){
+		if(atoi(dir_ip1[i]) > atoi(dir_ip2[i])){
+			retorno = 1;
+			break;
+		}
+		else if(atoi(dir_ip1[i]) < atoi(dir_ip2[i])){
+			retorno = -1;
+			break;
+		}
+		else retorno = 0;
+	}
+	return retorno;
+}
+
+//Funcion para guardar IPS en el ABB
+
+void almacenar_ips_abb(abb_t* arbol, recurso_t* recurso){
+
+	
+}
