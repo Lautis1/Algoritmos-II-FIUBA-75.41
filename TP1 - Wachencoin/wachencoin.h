@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include "pila.h"
 #include "lista.h"
-#include "cola.h"
 #include "strutil.h"
 #include <string.h>
 
