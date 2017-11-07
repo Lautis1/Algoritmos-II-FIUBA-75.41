@@ -126,5 +126,14 @@ int comparar_ips(char* ip_1, char* ip_2){
 
 void almacenar_ips_abb(abb_t* arbol, recurso_t* recurso){
 
-	
+	if(abb_pertenece(arbol, recurso->clave)){
+		recurso->cant_de_solicitudes++; //Supongo que si la ip ya esta en el abb, hay que aumentar
+										//su cantidad de solicitudes.
+	}
+	else{
+		abb_guardar(arbol, recurso->clave, recurso->cant_de_solicitudes);
+	}
+	//A la noche sigo que me quedo sin bateria en la facultad.
+	//no se como pasarle al abb la funcion de comparacion de IPS que hice.
+	//NO TE MANDES A HACERLA SOLO GIL, yo tambien quiero colaborar.
 }
