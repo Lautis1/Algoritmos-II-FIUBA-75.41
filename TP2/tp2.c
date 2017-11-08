@@ -9,6 +9,14 @@
 
 #define TIME_FORMAT "%FT%T%z"
 
+#define AGREGAR_ARCHIVO "agregar_archivo"
+#define VISITANTES "ver_visitantes"
+#define VISITADOS "ver_mas_visitados"
+
+#define CANT_PARAM_AGREGAR 1
+#define CANT_PARAM_VISITANTES 2
+#define CANT_PARAM_VISITADOS 1
+
 
 typedef struct recurso {
     char *clave;
@@ -68,12 +76,12 @@ bool pasar_recursos_de_hash_a_heap(hash_t* hash_temp_recursos, heap_t* heap_recu
     return true;
 }
 
-bool agregar_fecha_de_solicitud(char* ip, time_t fecha, hash_t peticiones_por_ip) {
+bool agregar_fecha_de_solicitud(char* ip, time_t fecha, hash_t* peticiones_por_ip) {
     if (!hash_pertenece(peticiones_por_ip, ip)) {
         lista_t *lista_aux = lista_crear();
         hash_guardar(peticiones_por_ip, ip, lista_aux);
     }
-    if (!lista_insertar_ultimo((lista_t *) hash_obtener(peticiones_por_ip, ip), instante)) return NULL;
+    if (!lista_insertar_ultimo((lista_t *) hash_obtener(peticiones_por_ip, ip), instante)) return false;
 }
 
 bool aumenta_cont_solicitudes_recurso(hash_t* temp_recursos_solicitados, char* recurso) {
@@ -122,18 +130,85 @@ int comparar_ips(char* ip_1, char* ip_2){
 	return retorno;
 }
 
-//Funcion para guardar IPS en el ABB
+//Funcion de comparacion de recurso_t
 
-void almacenar_ips_abb(abb_t* arbol, recurso_t* recurso){
+int comparar_recursos(recurso_t* recurso1, recurso_t* recurso2){
+	//Comparo la cantidad de solicitudes de cada recurso
 
-	if(abb_pertenece(arbol, recurso->clave)){
-		recurso->cant_de_solicitudes++; //Supongo que si la ip ya esta en el abb, hay que aumentar
-										//su cantidad de solicitudes.
+	int valor_retorno;
+	int cantidad_1 = recurso1->cant_de_solicitudes;
+	int cantidad_2 = recurso2->cant_de_solicitudes;
+	if(cantidad1 > cantidad2) valor_retorno = 1;
+	else if(cantidad1 < cantidad_2) valor_retorno = -1;
+	else valor_retorno = 0;
+	return valor_retorno;
+}
+
+//Imprimir error por stderr (por lo menos mi correctora exigia funcion auxiliar)
+void imprimir_error(char* comando){
+
+	fprintf(stderr, "Error en comando %c\n", comando);
+}
+
+//Funcion de comparacion de cadenas
+int comparar_cadenas(char* cadena1, char* cadena2){
+
+	return strcmp(cadena1, cadena2);
+}
+
+//Contar cantidad de parametros
+int contar_cantidad_parametros(char** array){
+
+	int cantidad = 0;
+	while(array[cantidad]){
+		cantidad++;
+	}
+	return cantidad;
+}
+
+//Hago algunas cosas para la interfaz
+
+int procesar_entrada_stdin(char* linea_entrada){
+
+	char** input = split(linea_entrada,' ');
+	int indice_corte = 0;
+	if(comparar_cadenas(input[0],AGREGAR_ARCHIVO)==0){
+		if(contar_cantidad_parametros(input) == CANT_PARAM_AGREGAR){
+		**funcion encargada, la hacemos juntos**
+		}
+		else{
+			imprimir_error(AGREGAR_ARCHIVO);
+			indice_corte = -1;
+		}
+	}
+	else if(comparar_cadenas(input[0],VISITADOS)==0){
+		if(contar_cantidad_parametros(input)==CANT_PARAM_VISITADOS){
+			**funcion**
+		}
+		else{
+			imprimir_error(VISITADOS);
+			indice_corte = -1;
+		}
+	}
+	else if(comparar_cadenas(input[0],VISITANTES)==0){
+		if(contar_cantidad_parametros(input)==CANT_PARAM_VISITANTES){
+			**FUNCION**
+		}
+		else {
+			imprimir_error(VISITANTES);
+			indice_corte = -1;
+		}
 	}
 	else{
-		abb_guardar(arbol, recurso->clave, recurso->cant_de_solicitudes);
+		imprimir_error(input[0]);
+		indice_corte = -1;
 	}
-	//A la noche sigo que me quedo sin bateria en la facultad.
-	//no se como pasarle al abb la funcion de comparacion de IPS que hice.
-	//NO TE MANDES A HACERLA SOLO GIL, yo tambien quiero colaborar.
+	free_strv(input);
+	if(indice_corte >= 0) fputs("OK\n",stdout);
+	return indice_corte;
+
 }
+
+
+
+
