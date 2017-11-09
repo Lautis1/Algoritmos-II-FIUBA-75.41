@@ -1,6 +1,10 @@
 #include "heap.h"
 #include "testing.h"
 #include <string.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "strutil.h"
 
 int comparar_enteros(void* valor1, void* valor2) {
@@ -181,8 +185,6 @@ void pruebas_heap_desde_arreglo() {
     print_test("La cantidad de elementos es igual a la proporcionada a la hora de crear la funcion", heap_cantidad(heap) == 123);
     print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == *(int*)array_punteros[122]);
 
-    print_test("Se ha ordenado el arreglo pasado por parametro mediante heapsort correctamente", esta_ordenado(array_punteros, (cmp_func_t )comparar_enteros, 123));
-
     int contador_errores = 0;
     for (int i = 122; i >= 0; i--) {
         if(heap_desencolar(heap) != array_punteros[i]) {
@@ -250,6 +252,8 @@ void pruebas_heapsort() {
 
     print_test("Se ordena un arreglo de chars correctamente", esta_ordenado(array_punteros_char, (cmp_func_t)strcmp, sizeof(array_chars)));
 }
+
+
 
 void pruebas_destruccion() {
 

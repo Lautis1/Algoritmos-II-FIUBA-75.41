@@ -321,22 +321,23 @@ INORDER*/
 
 //Recorre el arbol con recorrido inorder, aplicando la funcion visitar a cada
 //nodo.
-void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar){
-	
-	if(!nodo || !*continuar)  return;
-	iterador_inorder(nodo->izq,visitar,extra,continuar);
-	if(*continuar){
-		*continuar = visitar(nodo->clave,nodo->valor,extra);
-		if(!*continuar) return;
-	}
-	iterador_inorder(nodo->der,visitar,extra,continuar);
+void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar) {
 
-void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
-	
-	if(!arbol) return;
-	if(!visitar) return;
-	bool continuar = true;
-	iterador_inorder(arbol->raiz,visitar,extra,&continuar);
+    if (!nodo || !*continuar) return;
+    iterador_inorder(nodo->izq, visitar, extra, continuar);
+    if (*continuar) {
+        *continuar = visitar(nodo->clave, nodo->valor, extra);
+        if (!*continuar) return;
+    }
+    iterador_inorder(nodo->der, visitar, extra, continuar);
+}
+
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra) {
+
+    if (!arbol) return;
+    if (!visitar) return;
+    bool continuar = true;
+    iterador_inorder(arbol->raiz, visitar, extra, &continuar);
 }
 
 /* ******************************************************************
@@ -344,29 +345,28 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
  * *****************************************************************/
 //FUNCION AUXILIAR ENCARGADA DE APILAR LOS HIJOS IZQUIERDOS DE UN NODO Y SU RAIZ
 
-void apilar_nodos_izq(abb_iter_t* iter, nodo_abb_t* nodo){
+void apilar_nodos_izq(abb_iter_t *iter, nodo_abb_t *nodo) {
 
-	if(!nodo) return;
-	pila_apilar(iter->pila, nodo);
-	apilar_nodos_izq(iter,nodo->izq);
-
+    if (!nodo) return;
+    pila_apilar(iter->pila, nodo);
+    apilar_nodos_izq(iter, nodo->izq);
 }
 
 //Crea un iterador para el arbol.
 //PRE : el arbol fue creado.
 //POST: devuelve el iterador.
-abb_iter_t *abb_iter_in_crear(const abb_t *arbol){ //APILAR RAIZ Y TODOS LOS H.IZQ
-	
-	if(!arbol) return NULL;
-	abb_iter_t* iter = malloc(sizeof(abb_iter_t));
-	if(!iter) return NULL;
-	pila_t* pila = pila_crear();
+abb_iter_t *abb_iter_in_crear(const abb_t *arbol) { //APILAR RAIZ Y TODOS LOS H.IZQ
+
+    if (!arbol) return NULL;
+    abb_iter_t *iter = malloc(sizeof(abb_iter_t));
+    if (!iter) return NULL;
+    pila_t *pila = pila_crear();
     if (!pila) return NULL;
-	iter->pila = pila;
-	nodo_abb_t* nodo = arbol->raiz;
-	apilar_nodos_izq(iter,nodo);
-	iter->actual = pila_desapilar(iter->pila);
-	return iter;
+    iter->pila = pila;
+    nodo_abb_t *nodo = arbol->raiz;
+    apilar_nodos_izq(iter, nodo);
+    iter->actual = pila_desapilar(iter->pila);
+    return iter;
 }
 
 //Avanza una posicion sobre el arbol en recorrido inorder.
@@ -374,33 +374,34 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){ //APILAR RAIZ Y TODOS LOS H.I
 //POST : devuelve un booleano.
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
 
-	if(abb_iter_in_al_final(iter)) return false;
-	if(iter->actual->der){
-		apilar_nodos_izq(iter,iter->actual->der);
-	}
+    if (abb_iter_in_al_final(iter)) return false;
+    if (iter->actual->der) {
+        apilar_nodos_izq(iter, iter->actual->der);
+    }
     iter->actual = pila_desapilar(iter->pila);
-	return true;
+    return true;
 }
 
 //Devuelve un booleano segun si el iterador esta al
 //final del arbol o no.
-bool abb_iter_in_al_final(const abb_iter_t *iter){
-	
-	return(iter->actual == NULL);
+bool abb_iter_in_al_final(const abb_iter_t *iter) {
+
+    return (iter->actual == NULL);
 }
 
 //Devuelve la clave a la que apunta el iterador.
-const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
+const char *abb_iter_in_ver_actual(const abb_iter_t *iter) {
     if (iter->actual == NULL) return NULL;
 
-	return iter->actual->clave;
+    return iter->actual->clave;
 }
 
 //Destruye el iterador y su pila.
-void abb_iter_in_destruir(abb_iter_t* iter){
-	
-	pila_destruir(iter->pila);
-	free(iter);
+void abb_iter_in_destruir(abb_iter_t *iter) {
+
+    pila_destruir(iter->pila);
+    free(iter);
 }
+
 
 
