@@ -1,4 +1,9 @@
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "heap.h"
+
 
 #define TAM_INICIAL 32
 
