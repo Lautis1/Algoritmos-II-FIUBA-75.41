@@ -14,7 +14,7 @@ time_t iso8601_to_time(const char* iso8601);
 
 bool procesar_log(char* nombre_de_archivo, heap_t* recursos_mas_solicitados, heap_t* solicitantes);
 
-bool pasar_recursos_de_hash_a_heap(char* clave, void* recurso, void* heap);
+void pasar_recursos_de_hash_a_heap(char* clave, void* recurso, void* heap);
 
 bool agregar_fecha_de_request(char* ip, time_t fecha, hash_t* peticiones_por_ip);
 
