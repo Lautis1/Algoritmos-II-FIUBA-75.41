@@ -47,7 +47,7 @@ bool procesar_log(char* nombre_de_archivo, heap_t* recursos_mas_solicitados, hea
     ssize_t leidos;
 
     // Va a haber que crear un wrapper para el lista destruir, para que coincidan las firmas.
-    hash_t* peticiones_por_ip = hash_crear(lista_destruir);
+    hash_t* peticiones_por_ip = hash_crear((hash_destruir_dato_t)lista_destruir);
     if (peticiones_por_ip == NULL) return false;
 
     hash_t* temp_recursos_solicitados = hash_crear(NULL);
@@ -74,8 +74,8 @@ bool procesar_log(char* nombre_de_archivo, heap_t* recursos_mas_solicitados, hea
     return true;
 }
 
-bool pasar_recursos_de_hash_a_heap(char* clave, void* recurso, void* heap) {
-    return heap_encolar((heap_t*)heap, recurso);
+void pasar_recursos_de_hash_a_heap(char* clave, void* recurso, void* heap) {
+    heap_encolar((heap_t*)heap, recurso);
 }
 
 void detectar_DOS_guardar_ips_en_abb(char* ip, void* solicitudes_ip, void* abb) {
@@ -153,7 +153,6 @@ void iterar_hash(hash_t* hash, void visitar(char* clave, void *dato, void *extra
 
 void imprimir_dos(char* direccion_ip){
 
-	if(!direccion_ip) return;
 	fprintf(stdout, "DoS: %s\n", direccion_ip);
 }
 
