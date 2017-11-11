@@ -39,5 +39,7 @@ const char *abb_iter_in_ver_actual(const abb_iter_t *iter);
 bool abb_iter_in_al_final(const abb_iter_t *iter);
 void abb_iter_in_destruir(abb_iter_t* iter);
 
+//FUNCION DE ITERACION PARA EL TP2
+void recorrido_arbol(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra, char* inicio,char* fin, abb_comparar_clave_t cmp);
 #endif //ABB_H
 
