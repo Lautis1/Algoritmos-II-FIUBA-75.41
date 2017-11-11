@@ -8,7 +8,7 @@ char** split(const char* str, char sep) {
     if (sep == '\0') return NULL;
 
     int i = 0;
-    int cant_apariciones_sep = 0;
+    size_t cant_apariciones_sep = 0;
     size_t largo_de_cadena = strlen(str);
 
     while (str[i] != '\0') {
