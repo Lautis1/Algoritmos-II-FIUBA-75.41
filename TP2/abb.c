@@ -324,11 +324,13 @@ INORDER*/
 void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar) {
 
     if (!nodo || !*continuar) return;
+
     iterador_inorder(nodo->izq, visitar, extra, continuar);
     if (*continuar) {
         *continuar = visitar(nodo->clave, nodo->valor, extra);
         if (!*continuar) return;
     }
+
     iterador_inorder(nodo->der, visitar, extra, continuar);
 }
 
@@ -402,6 +404,38 @@ void abb_iter_in_destruir(abb_iter_t *iter) {
     pila_destruir(iter->pila);
     free(iter);
 }
+
+//////////////////////////////////////////////////////////
+//FUNCION REALIZADA PARA UTILIZAR EN EL TP2
+//RECORRE, MEDIANTE RECORRIDO INORDER, EL ARBOL QUE CONTIENE
+//LAS DIRECCIONES IP DE LOS VISITANTES.
+//LAS MUESTRA POR PANTALLA EN UN DETERMINADO RANGO.
+
+void iterador_inorder(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar, char* inicio,char* fin, abb_comparar_clave_t comparar) {
+
+    if (!nodo || !*continuar) return;
+    if(comparar(nodo->clave, inicio) < 0){
+        iterador_inorder(nodo->der, visitar, extra, continuar, inicio, fin, comparar);
+        if (*continuar) {
+            *continuar = visitar(nodo->clave, nodo->clave, extra);
+        if (!*continuar) return;
+        }
+    }
+    if(comparar(nodo->clave, fin) > 0){
+        iterador_inorder(nodo->izq, visitar, extra, continuar,inicio,fin,comparar);
+    }
+}
+
+void recorrido_arbol(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra, char* inicio,char* fin, abb_comparar_clave_t cmp){
+
+    if (!arbol) return;
+    if (!visitar) return;
+    bool continuar = true;
+    iterador_inorder(arbol->raiz, visitar, extra, &continuar, inicio, fin, comparar);
+}
+
+
+
 
 
 

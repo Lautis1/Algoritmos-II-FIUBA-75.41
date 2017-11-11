@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 700
+ #define _XOPEN_SOURCE 700
 
 #include <time.h>
 #include "tp2.h"
@@ -170,8 +170,13 @@ int comparar_ips(const char* ip_1, const char* ip_2){
 	return retorno;
 }
 
-//Funcion de comparacion de recurso_t
+//Wrapper para la funcion de comparacion de ip's
 
+void comparacion(void* dato1, void* dato2){
+
+	comparar_ips(dato1,dato2);
+}
+//Funcion de comparacion de recurso_t
 int comparar_recursos(recurso_t* recurso1, recurso_t* recurso2){
 	
 	//Comparo la cantidad de solicitudes de cada recurso
@@ -224,30 +229,22 @@ void mostrar_mas_visitados(heap_t* recursos_mas_solicitados,  int n){
 //que vaa desde "ip_desde" a "ip_hasta". (MODIFICAR, HAY QUE APILAR SOLO
 //LOS NODOS PERTENECIENTES AL RANGO.)
 
-bool iterar_abb_visitantes(abb_t* arbol_visitantes, char* ip_desde, char* ip_hasta){
+void mostrar_visitantes(abb_t* arbol_visitantes, char* ip_inicio, char* ip_fin){
 
-	if(abb_cantidad(arbol_visitantes)==0) return false;
-	abb_iter_t* iter = abb_iter_in_crear(arbol_visitantes);
-	if(!iter) return false;
-	fputs("Visitantes: \n\t", stdout);
-	while(!abb_iter_in_al_final(iter)){
-		if(comparar_ips(abb_iter_in_ver_actual(iter), ip_desde) < 0 || comparar_ips(abb_iter_in_ver_actual(iter),ip_hasta) > 0){
-			abb_iter_in_avanzar(iter);
-			continue;
-		}
-		else{
-			if(comparar_ips(abb_iter_in_ver_actual(iter), ip_desde) > 0 && comparar_ips(abb_iter_in_ver_actual(iter), ip_hasta) < 0){
-				printf("\t%s\n", ip_desde);
-				printf("\t%s\n", abb_iter_in_ver_actual(iter));
-				printf("\t%s\n", ip_hasta);
-			}
-		}
-		abb_iter_in_avanzar(iter);
-	}
+	if(abb_cantidad(arbol_visitantes == 0)) return;
+	fputs("Visitantes: \n");
+	abb_in_order(arbol_visitantes, imprimir_claves, extra, ip_inicio, ip_fin, comparacion);
+
+}
+
+bool imprimir_claves(const char* ip, void* dato1, void* dato2){
+
+	printf("\t%s\n", ip);
 	return true;
 }
 
 
+//FUNCION ENCARGADA DE PROCESAR LO INGRESADO POR EL USUARIO A TRAVES DE ENTRADA STANDARD.
 int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t* recursos_mas_solicitados){
 
 	char** input = split(linea_entrada,' ');
@@ -272,7 +269,7 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t*
 	}
 	else if(comparar_cadenas(input[0],VISITANTES)==0){
 		if(contar_cantidad_parametros(input)==CANT_PARAM_VISITANTES){
-			iterar_abb_visitantes(arbol_visitantes, input[1], input[2]);
+			mostrar_visitantes(arbol_visitantes, input[1], input[2]);
 		}
 		else {
 			imprimir_error(VISITANTES);
@@ -289,6 +286,9 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t*
 
 }
 
+
+
+//
 
 
 
