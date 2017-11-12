@@ -11,7 +11,7 @@ bool procesar_log(char* nombre_de_archivo, hash_t* recursos_mas_solicitados, abb
     size_t capacidad = 0;
     ssize_t leidos;
 
-    hash_t* peticiones_por_ip = hash_crear((hash_destruir_dato_t)lista_destruir);
+    hash_t* peticiones_por_ip = hash_crear((hash_destruir_dato_t)wrapper_destruir_hash_solicitudes);
     if (peticiones_por_ip == NULL) return false;
 
     while ((leidos = getline(&linea, &capacidad, archivo)) > 0) {
@@ -57,6 +57,7 @@ void procesar_n_a_mostrar(heap_t* min_heap, hash_t* recursos_mas_solicitados, in
         hash_iter_avanzar(iter);
         n--;
     }
+    hash_iter_destruir(iter);
 }
 
 //Muestra los "N" sitios mas visitados de la pagina.
@@ -65,8 +66,8 @@ void mostrar_mas_visitados(hash_t* recursos_mas_solicitados, int cantidad_de_rec
     printf("Sitios mas visitados:\n");
     heap_t* recursos_temp = heap_crear((cmp_func_t)comparar_recursos);
     if(!recursos_temp) return;
-    iterar_hash(recursos_mas_solicitados,func_visitar,recursos_temp);
     procesar_n_a_mostrar(recursos_temp, recursos_mas_solicitados, cantidad_de_recursos_a_mostrar);
+    iterar_hash(recursos_mas_solicitados,func_visitar,recursos_temp);
     mostrar_n_recursos(recursos_temp, cantidad_de_recursos_a_mostrar);
     heap_destruir(recursos_temp, NULL);
 }

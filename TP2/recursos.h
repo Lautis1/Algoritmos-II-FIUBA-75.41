@@ -16,4 +16,8 @@ int comparar_recursos(recurso_t* recurso1, recurso_t* recurso2);
 
 recurso_t* crear_recurso(char* nombre_recurso);
 
+void destruir_recurso(recurso_t* recurso);
+
+void wrapper_destruir_recurso(void* dato);
+
 #endif //ALGOS_GITHUB_RECURSOS_H

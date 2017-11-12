@@ -11,7 +11,7 @@ int main() {
 
     abb_t* visitantes = abb_crear((abb_comparar_clave_t)comparar_ips, NULL);
 
-    hash_t* recursos = hash_crear(free);
+    hash_t* recursos = hash_crear(wrapper_destruir_recurso);
 
     recibir_comandos(visitantes, recursos);
 

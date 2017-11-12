@@ -15,6 +15,8 @@ bool agregar_fecha_de_solicitud(char* ip, time_t* fecha, hash_t* peticiones_por_
 
 void imprimir_dos(const char* direccion_ip);
 
+void wrapper_destruir_hash_solicitudes(void* lista);
+
 #endif //ALGOS_GITHUB_DOS_H
 
 
