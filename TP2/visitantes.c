@@ -22,6 +22,9 @@ int comparar_ips(const char* ip_1, const char* ip_2){
         }
         else retorno = 0;
     }
+    free_strv(dir_ip1);
+    free_strv(dir_ip2);
+
     return retorno;
 }
 

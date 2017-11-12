@@ -25,14 +25,15 @@
 
 // ---------------------------------------------------------------------------- //
 
-void recibir_comandos(abb_t* visitantes, heap_t* recursos) {
+void recibir_comandos(abb_t* visitantes, hash_t* recursos_mas_solicitados) {
+    
     char str[TAM_BUFFER];
     void* estado;
     do {
         estado = fgets(str, TAM_BUFFER, stdin);
         quitar_caracter_new_line(str);
     }
-    while (estado != NULL && procesar_entrada_stdin(str, visitantes, recursos) == 0);
+    while (estado != NULL && procesar_entrada_stdin(str, visitantes, recursos_mas_solicitados) == 0);
 }
 
 
@@ -46,6 +47,7 @@ void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void 
         visitar(clave_actual, dato_actual, extra);
         hash_iter_avanzar(iter_hash);
     }
+    hash_iter_destruir(iter_hash);
 }
 
 void imprimir_error(char* comando){
@@ -62,13 +64,13 @@ int contar_cantidad_parametros(char** array){
 	return cantidad;
 }
 
-int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t* recursos_mas_solicitados){
+int procesar_entrada_stdin(char* linea_entrada, abb_t* visitantes, hash_t* recursos_mas_solicitados){
 
 	char** input = split(linea_entrada,' ');
 	int indice_corte = 0;
 	if(strcmp(input[0],AGREGAR_ARCHIVO) == 0){
 		if(contar_cantidad_parametros(input) == CANT_PARAM_AGREGAR){
-			procesar_log(input[1],recursos_mas_solicitados, arbol_visitantes);
+			procesar_log(input[1],recursos_mas_solicitados, visitantes);
 		}
 		else{
 			imprimir_error(AGREGAR_ARCHIVO);
@@ -86,7 +88,7 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t*
 	}
 	else if(strcmp(input[0],VISITANTES)==0){
 		if(contar_cantidad_parametros(input) == CANT_PARAM_VISITANTES){
-			mostrar_visitantes(arbol_visitantes, input[1], input[2]);
+			mostrar_visitantes(visitantes, input[1], input[2]);
 		}
 		else {
 			imprimir_error(VISITANTES);

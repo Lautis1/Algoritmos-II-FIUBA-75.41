@@ -11,11 +11,12 @@ int main() {
 
     abb_t* visitantes = abb_crear((abb_comparar_clave_t)comparar_ips, NULL);
 
-    heap_t* recursos = heap_crear((cmp_func_t)comparar_recursos);
+    hash_t* recursos = hash_crear(free);
 
     recibir_comandos(visitantes, recursos);
 
-    // Destruir TODO
+    hash_destruir(recursos);
+    abb_destruir(visitantes);
 
     return 0;
 }

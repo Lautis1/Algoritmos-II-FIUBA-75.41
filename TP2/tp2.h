@@ -24,8 +24,8 @@ void imprimir_error(char* comando);
 
 int contar_cantidad_parametros(char** array);
 
-int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t* recursos_mas_solicitados);
+int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, hash_t* recursos_mas_solicitados);
 
-void recibir_comandos(abb_t* visitantes, heap_t* recursos);
+void recibir_comandos(abb_t* visitantes, hash_t* recursos);
 
 #endif //ALGOS_GITHUB_TP2_H
