@@ -72,3 +72,8 @@ void imprimir_dos(const char* direccion_ip){
     fprintf(stdout, "DoS: %s\n", direccion_ip);
 }
 
+void wrapper_destruir_hash_solicitudes(void* lista) {
+    lista_t* lista_solicitudes = lista;
+    lista_destruir(lista_solicitudes, free);
+}
+

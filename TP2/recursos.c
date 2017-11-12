@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 700
+
 #include "recursos.h"
 
 
@@ -31,8 +33,18 @@ recurso_t* crear_recurso(char* nombre_recurso) {
     recurso_t *recurso = malloc(sizeof(recurso_t));
     if (recurso== NULL) return NULL;
 
-    recurso->clave = nombre_recurso;
+    recurso->clave = strdup(nombre_recurso);
     recurso->cant_de_solicitudes = 0;
 
     return recurso;
+}
+
+void destruir_recurso(recurso_t* recurso) {
+    free(recurso->clave);
+    free(recurso);
+}
+
+void wrapper_destruir_recurso(void* dato) {
+    recurso_t* recurso = dato;
+    destruir_recurso(recurso);
 }
