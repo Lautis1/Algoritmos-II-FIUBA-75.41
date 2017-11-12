@@ -61,23 +61,19 @@ void prueba_algunos_elementos(){
 void prueba_muchos_elementos(size_t largo){
 	fputs("### INICIO DE PRUEBAS CON MUCHOS ELEMENTOS ###\n",stdout);
 	//Inserto 'cantidad_elementos' veces el mismo par clave,valor
-	abb_t* arbol4 = abb_crear(strcmp,free);
+	abb_t* arbol4 = abb_crear(strcmp,NULL);
 	//FUNCION EXTRAIDA DE LAS PRUEBAS DE LA CATEDRA DEL HASH.
 	const size_t largo_clave = 10;
     char (*claves)[largo_clave] = malloc(largo * largo_clave);
-	unsigned* valores[largo];
+    unsigned* valores[largo];
     bool ok = true;
     for (unsigned i = 0; i < largo; i++) {
         valores[i] = malloc(sizeof(int));
-        for(size_t j=0; j<largo_clave-1; j++)
-        {
-            int x = 'A' + (rand() % 26);
-            claves[i][j] = (char) x;
-        }
-        claves[i][largo_clave-1] = '\0';
+        sprintf(claves[i], "%08d", i);
         *valores[i] = i;
         ok = abb_guardar(arbol4, claves[i], valores[i]);
         if (!ok) break;
+    
     }
     print_test("Se insertaron muchos elementos", ok);
 	print_test("Cantidad es largo", abb_cantidad(arbol4)==largo);
@@ -160,16 +156,11 @@ void pruebas_iterar_volumen(size_t largo){
 	abb_t* arbol7 = abb_crear(strcmp,free);
 	const size_t largo_clave = 10;
     char (*claves)[largo_clave] = malloc(largo * largo_clave);
-	unsigned* valores[largo];
+    unsigned* valores[largo];
     bool ok = true;
     for (unsigned i = 0; i < largo; i++) {
         valores[i] = malloc(sizeof(int));
-        for(size_t j=0; j<largo_clave-1; j++)
-        {
-            int x = 'A' + (rand() % 26);
-            claves[i][j] = (char) x;
-        }
-        claves[i][largo_clave-1] = '\0';
+        sprintf(claves[i], "%08d", i);
         *valores[i] = i;
         ok = abb_guardar(arbol7, claves[i], valores[i]);
         if (!ok) break;
@@ -187,7 +178,31 @@ void pruebas_iterar_volumen(size_t largo){
 	abb_iter_in_destruir(iter3);
 	free(claves);
 	abb_destruir(arbol7);
+	printf("\n");
 
+}
+bool contar_datos(const char* clave, void* valor, void* extra){
+	
+	size_t* num = extra;
+	print_test("Iterando",true);
+	if(clave) *num+=1;
+	return true;
+}
+void pruebas_iterador_interno(){
+	fputs("### INICIO DE PRUEBAS CON ITERADOR INTERNO ###\n",stdout);
+	abb_t* arbol8 = abb_crear(strcmp,NULL);
+	char* claves[] = {"10","20","30","40"};
+	char* valores[] = {"1","2","3","4"};
+	print_test("Inserto primer par",abb_guardar(arbol8,claves[0],valores[0]));
+	print_test("Inserto segundo par", abb_guardar(arbol8,claves[1],valores[1]));
+	print_test("Inserto tercer par", abb_guardar(arbol8,claves[2],valores[2]));
+	print_test("Inserto cuarto par", abb_guardar(arbol8,claves[3],valores[3]));
+	size_t num=0;
+	abb_in_order(arbol8,contar_datos,&num);
+	//La cantidad deberia ser 4 si se itero correctamente
+	print_test("Cantidad iterada correctamente", num==4);
+	abb_destruir(arbol8);
+	printf("\n");
 }
 
 void pruebas_abb_alumno(){
@@ -195,8 +210,9 @@ void pruebas_abb_alumno(){
 	prueba_crear_arbol_vacio();
 	prueba_abb_null();
 	prueba_algunos_elementos();
-	prueba_muchos_elementos(5000);
+	prueba_muchos_elementos(500);
 	pruebas_iter_abb_vacio();
 	pruebas_iter_algunos_elementos();
-	pruebas_iterar_volumen(5000);
+	pruebas_iterar_volumen(500);
+	pruebas_iterador_interno();
 }

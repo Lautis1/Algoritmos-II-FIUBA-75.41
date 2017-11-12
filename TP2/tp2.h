@@ -1,32 +1,31 @@
 #ifndef ALGOS_GITHUB_TP2_H
 #define ALGOS_GITHUB_TP2_H
 
-#include "hash.h"
-#include "lista.h"
-#include "heap.h"
-#include "strutil.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <stddef.h>
+#include "hash.h"
+#include "lista.h"
+#include "heap.h"
+#include "strutil.h"
+#include "abb.h"
+#include "DOS.h"
+#include "recursos.h"
+#include "visitantes.h"
+#include "comandos.h"
 
-time_t iso8601_to_time(const char* iso8601);
 
-bool procesar_log(char* nombre_de_archivo, heap_t* recursos_mas_solicitados, heap_t* solicitantes);
+void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void *extra), void *extra);
 
-void pasar_recursos_de_hash_a_heap(char* clave, void* recurso, void* heap);
+void imprimir_error(char* comando);
 
-bool agregar_fecha_de_request(char* ip, time_t fecha, hash_t* peticiones_por_ip);
+int contar_cantidad_parametros(char** array);
 
-bool aumenta_cont_solicitudes_recurso(hash_t* temp_recursos_solicitados, char* recurso);
+int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, heap_t* recursos_mas_solicitados);
 
-bool agregar_fecha_de_solicitud(char* ip, time_t fecha, hash_t* peticiones_por_ip);
-
-void imprimir_dos(char* direccion_ip);
-
-bool usuario_hizo_mas_solicitudes_de_las_permitidas(lista_t* lista_solicitudes);
-
-void iterar_hash(hash_t* hash, void visitar(char* clave, void *dato, void *extra), void *extra);
-
+void recibir_comandos(abb_t* visitantes, heap_t* recursos);
 
 #endif //ALGOS_GITHUB_TP2_H
