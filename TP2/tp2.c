@@ -18,13 +18,9 @@
 
 #define TAM_BUFFER 300
 
-
-//DEFINICION DEL TIPO DE DATO RECURSO_T
-
-
-
-// ---------------------------------------------------------------------------- //
-
+/**************************************************************************************/
+//Funcion que recibe un arbol de visitantes y un hash con los recursos mas solicitados del log.
+//Lee por entrada standard lo que ingresa el usuario y llama a la funcion que procesa esos datos.
 void recibir_comandos(abb_t* visitantes, hash_t* recursos_mas_solicitados) {
     
     char str[TAM_BUFFER];
@@ -36,7 +32,7 @@ void recibir_comandos(abb_t* visitantes, hash_t* recursos_mas_solicitados) {
     while (estado != NULL && procesar_entrada_stdin(str, visitantes, recursos_mas_solicitados) == 0);
 }
 
-
+//Funcion que itera un hash, aplicandole la funcion visitar a cada item.
 void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void *extra), void *extra) {
     
     hash_iter_t* iter_hash = hash_iter_crear(hash);
@@ -50,11 +46,16 @@ void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void 
     hash_iter_destruir(iter_hash);
 }
 
+/*FUNCION AUXILIAR*/
+//Funcion encargada de imprimir un error de comando por stderr.
 void imprimir_error(char* comando){
 
 	fprintf(stderr, "Error en comando %s\n", comando);
 }
 
+/*FUNCION AUXILIAR*/
+//Funcion encargada de contar la cantidad de componentes de un arreglo.
+//Devuelve esa cantidad.
 int contar_cantidad_parametros(char** array){
 
 	int cantidad = 0;
@@ -64,6 +65,9 @@ int contar_cantidad_parametros(char** array){
 	return cantidad;
 }
 
+//Funcion encargada de procesar lo que ingresa el usuario en entrada standard.
+//Segun el comando que ingrese, efectua dicha operacion.
+//Devuelve un entero que representa el estado de la ejecucion de la funcion.
 int procesar_entrada_stdin(char* linea_entrada, abb_t* visitantes, hash_t* recursos_mas_solicitados){
 
 	char** input = split(linea_entrada,' ');

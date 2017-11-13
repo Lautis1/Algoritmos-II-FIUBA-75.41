@@ -13,13 +13,16 @@
 #define RANGO_DE_TIEMPO_CONSIDERADO 2
 
 
-
+// Dada una cadena en formato ISO-8601 devuelve una variable de tipo time_t
+// que representa un instante en el tiempo.
 time_t iso8601_to_time(const char* iso8601) {
     struct tm bktime = { 0 };
     strptime(iso8601, TIME_FORMAT, &bktime);
     return mktime(&bktime);
 }
 
+//Dada una ip, un puntero a una lista y un puntero a un ABB, detecta si
+//un usuario hizo mas solicitudes de las permitidas en menos de 2 segundos.
 void detectar_DOS(const char* ip, void* solicitudes_ip, void* arbol_visitantes) {
     lista_t* lista_solicitudes = solicitudes_ip;
     if(usuario_hizo_mas_solicitudes_de_las_permitidas(lista_solicitudes)) {
@@ -27,6 +30,8 @@ void detectar_DOS(const char* ip, void* solicitudes_ip, void* arbol_visitantes) 
     }
 }
 
+//Recorre la lista de solicitudes y detecta si una direccion ip es sospechosa de DoS
+//Devuelve true o false dependiendo del estado de la operacion.
 bool usuario_hizo_mas_solicitudes_de_las_permitidas(lista_t* lista_solicitudes) {
 
     if (lista_largo(lista_solicitudes) < N_SOL_CONSIDERADAS_DDOS) return false;
@@ -55,6 +60,8 @@ bool usuario_hizo_mas_solicitudes_de_las_permitidas(lista_t* lista_solicitudes) 
     return estado;
 }
 
+//Agrega la fecha en que se hizo la solicitud a un recurso.
+//Devuelve true o false dependiendo del estado de la operacion.
 bool agregar_fecha_de_solicitud(char* ip, time_t* fecha, hash_t* peticiones_por_ip) {
 
     if (!hash_pertenece(peticiones_por_ip, ip)) {
@@ -66,12 +73,12 @@ bool agregar_fecha_de_solicitud(char* ip, time_t* fecha, hash_t* peticiones_por_
 }
 
 //Imprimir posibles ip con DoS
-
 void imprimir_dos(const char* direccion_ip){
 
     fprintf(stdout, "DoS: %s\n", direccion_ip);
 }
 
+//Funcion que modifica la firma de lista_destruir para ser utilizada en otra funcion.
 void wrapper_destruir_hash_solicitudes(void* lista) {
     lista_t* lista_solicitudes = lista;
     lista_destruir(lista_solicitudes, free);

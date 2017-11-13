@@ -405,27 +405,29 @@ void abb_iter_in_destruir(abb_iter_t* iter){
 	free(iter);
 }
 
-//////////////////////////////////////////////////////////
+/***********************************************************************************************************/
 //FUNCION REALIZADA PARA UTILIZAR EN EL TP2
-//RECORRE, MEDIANTE RECORRIDO INORDER, EL ARBOL QUE CONTIENE
-//LAS DIRECCIONES IP DE LOS VISITANTES.
-//LAS MUESTRA POR PANTALLA EN UN DETERMINADO RANGO.
+//Recorre, en InOrder, el arbol binario que contiene las direcciones
+//IP de los visitantes del sitio. La funcion visitar se encarga de imprimir
+//las ips que esten dentro del rango <inicio> <fin>.
 
 void iterador_inorder_desde_hasta(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar, char* inicio,char* fin, abb_comparar_clave_t comparar) {
 
     if (!nodo || !*continuar) return;
-    if(comparar(nodo->clave, inicio) < 0){
+    if(comparar(nodo->clave, inicio) <= 0){
         iterador_inorder_desde_hasta(nodo->der, visitar, extra, continuar, inicio, fin, comparar);
-        if (*continuar) {
-            *continuar = visitar(nodo->clave, nodo->valor, extra);
-            if (!*continuar) return;
-        }
     }
-    if(comparar(nodo->clave, fin) > 0){
+    if (*continuar) {
+        *continuar = visitar(nodo->clave, nodo->valor, extra);
+        if (!*continuar) return;
+    }
+    
+    if(comparar(nodo->clave, fin) >= 0){
         iterador_inorder_desde_hasta(nodo->izq, visitar, extra, continuar,inicio,fin,comparar);
     }
 }
 
+//Funcion llamada en tp2.c, llama al iterador inorder del abb.
 void recorrido_arbol(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra, char* inicio,char* fin){
 
     if (!arbol) return;
