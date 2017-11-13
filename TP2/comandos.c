@@ -9,6 +9,7 @@
 bool procesar_log(char* nombre_de_archivo, hash_t* recursos_mas_solicitados, abb_t* visitantes) {
     
     FILE* archivo = fopen(nombre_de_archivo, "r");
+    if(archivo == NULL) return false;
     char *linea = NULL;
     size_t capacidad = 0;
     ssize_t leidos;
@@ -96,7 +97,7 @@ void mostrar_n_recursos(heap_t* recursos_temp, int cantidad_de_recursos_a_mostra
 void mostrar_visitantes(abb_t* visitantes, char* ip_inicio, char* ip_fin){
 
     if(abb_cantidad(visitantes) == 0) return;
-    fprintf(stdout, "Visitantes: \n");
+    fprintf(stdout, "Visitantes:\n");
     recorrido_arbol(visitantes, imprimir_claves, NULL, ip_inicio, ip_fin);
 
 }

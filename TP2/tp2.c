@@ -74,11 +74,10 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* visitantes, hash_t* recur
 	int indice_corte = 0;
 	if(strcmp(input[0],AGREGAR_ARCHIVO) == 0){
 		if(contar_cantidad_parametros(input) == CANT_PARAM_AGREGAR){
-			procesar_log(input[1],recursos_mas_solicitados, visitantes);
-		}
-		else{
-			imprimir_error(AGREGAR_ARCHIVO);
-			indice_corte = -1;
+			if(!procesar_log(input[1],recursos_mas_solicitados, visitantes)){
+				imprimir_error(AGREGAR_ARCHIVO);
+				indice_corte = -1;
+			}
 		}
 	}
 	else if(strcmp(input[0],VISITADOS)==0){
