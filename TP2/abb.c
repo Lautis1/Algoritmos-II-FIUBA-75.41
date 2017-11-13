@@ -411,19 +411,20 @@ void abb_iter_in_destruir(abb_iter_t* iter){
 //IP de los visitantes del sitio. La funcion visitar se encarga de imprimir
 //las ips que esten dentro del rango <inicio> <fin>.
 
-void iterador_inorder_desde_hasta(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, bool* continuar, char* inicio,char* fin, abb_comparar_clave_t comparar) {
+void iterador_inorder_desde_hasta(nodo_abb_t* nodo, bool visitar(const char *, void *, void *),void* extra, char* inicio,char* fin, abb_comparar_clave_t comparar) {
 
-    if (!nodo || !*continuar) return;
-    if(comparar(nodo->clave, inicio) <= 0){
-        iterador_inorder_desde_hasta(nodo->der, visitar, extra, continuar, inicio, fin, comparar);
+    if (!nodo) return;
+    if(comparar(nodo->clave, inicio) < 0){
+        iterador_inorder_desde_hasta(nodo->der, visitar, extra, inicio, fin, comparar);
     }
-    if (*continuar) {
-        *continuar = visitar(nodo->clave, nodo->valor, extra);
-        if (!*continuar) return;
+    else if (comparar(nodo->clave, inicio) >= 0 && comparar(nodo->clave, fin) <= 0) {
+        iterador_inorder_desde_hasta(nodo->izq, visitar, extra,inicio,fin,comparar);
+        visitar(nodo->clave, nodo->valor, extra);
+        iterador_inorder_desde_hasta(nodo->der, visitar, extra, inicio, fin, comparar);
     }
     
-    if(comparar(nodo->clave, fin) >= 0){
-        iterador_inorder_desde_hasta(nodo->izq, visitar, extra, continuar,inicio,fin,comparar);
+    if(comparar(nodo->clave, fin) >= 0) {
+        iterador_inorder_desde_hasta(nodo->izq, visitar, extra,inicio,fin,comparar);
     }
 }
 
@@ -432,7 +433,6 @@ void recorrido_arbol(abb_t *arbol, bool visitar(const char *, void *, void *), v
 
     if (!arbol) return;
     if (!visitar) return;
-    bool continuar = true;
-    iterador_inorder_desde_hasta(arbol->raiz, visitar, extra, &continuar, inicio, fin, arbol->cmp);
+    iterador_inorder_desde_hasta(arbol->raiz, visitar, extra, inicio, fin, arbol->cmp);
 }
 
