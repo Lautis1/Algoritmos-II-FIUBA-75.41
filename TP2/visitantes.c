@@ -10,11 +10,11 @@ int comparar_ips(const char* ip_1, const char* ip_2){
     char** dir_ip2 = split(ip_2, '.');
     int retorno;
     for(int i=0; i<4; i++){
-        if(atoi(dir_ip1[i]) > atoi(dir_ip2[i])){
+        if(atoi(dir_ip1[i]) < atoi(dir_ip2[i])){
             retorno = -1;
             break;
         }
-        else if(atoi(dir_ip1[i]) < atoi(dir_ip2[i])){
+        else if(atoi(dir_ip1[i]) > atoi(dir_ip2[i])){
             retorno = 1;
             break;
         }
