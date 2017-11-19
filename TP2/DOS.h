@@ -9,7 +9,7 @@ time_t iso8601_to_time(const char* iso8601);
 
 //Dada una ip, un puntero a una lista y un puntero a un ABB, detecta si
 //un usuario hizo mas solicitudes de las permitidas en menos de 2 segundos.
-void detectar_DOS(const char* ip, void* solicitudes_ip, void* arbol_visitantes);
+bool detectar_DOS(const char* ip, void* dato1, void* hash);
 
 //Recorre la lista de solicitudes y detecta si una direccion ip es sospechosa de DoS
 //Devuelve true o false dependiendo del estado de la operacion.

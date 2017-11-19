@@ -9,9 +9,6 @@
 //un tema de convencion a la hora de imprmir las ip's en orden creciente).
 int comparar_ips(const char* ip_1, const char* ip_2);
 
-//Wrapper para la funcion de comparacion de ip's
-void comparacion(void* dato1, void* dato2);
-
 //Funcion que imprime una ip dada por parametro.
 bool imprimir_claves(const char* ip, void* dato1, void* dato2);
 

@@ -21,9 +21,6 @@
 //Lee por entrada standard lo que ingresa el usuario y llama a la funcion que procesa esos datos.
 void recibir_comandos(abb_t* visitantes, hash_t* recursos);
 
-//Funcion que itera un hash, aplicandole la funcion visitar a cada item.
-void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void *extra), void *extra);
-
 //Funcion encargada de imprimir un error de comando por stderr.
 void imprimir_error(char* comando);
 
@@ -35,5 +32,9 @@ int contar_cantidad_parametros(char** array);
 //Segun el comando que ingrese, efectua dicha operacion.
 //Devuelve un entero que representa el estado de la ejecucion de la funcion.
 int procesar_entrada_stdin(char* linea_entrada, abb_t* arbol_visitantes, hash_t* recursos_mas_solicitados);
+
+//Recibe una cadena y reemplaza el caracter de salto de linea
+//por el caracter de fin de cadena.
+void quitar_caracter_new_line(char* cadena);
 
 #endif //ALGOS_GITHUB_TP2_H
