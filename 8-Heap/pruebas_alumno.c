@@ -7,6 +7,12 @@
 #include <stdbool.h>
 #include "strutil.h"
 
+#define CANT_ELEM_ARRAY_VOLUMEN 4321
+#define CANT_ELEM_ARRAY_PRUEBAS 123
+#define CANT_ELEM_RANDOM 344
+#define CANT_ENTEROS_ORDENADOS 456
+#define CANT_ELEM_PRUEBAS_DESTRUIR 19
+
 int comparar_enteros(void* valor1, void* valor2) {
     int numero1 = *(int*) valor1;
     int numero2 = *(int*) valor2;
@@ -20,13 +26,11 @@ bool esta_ordenado(void** elementos, cmp_func_t cmp, size_t cant) {
     return true;
 }
 
-void shuffle(int *array, size_t n)
-{
-    if (n > 1)
-    {
+void shuffle(int *array, size_t n){
+    
+    if (n > 1){
         size_t i;
-        for (i = 0; i < n - 1; i++)
-        {
+        for (i = 0; i < n - 1; i++){
             size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
             int t = array[j];
             array[j] = array[i];
@@ -126,8 +130,8 @@ void pruebas_pocos_elementos() {
 void pruebas_heap_volumen() {
     printf("\nINICIO DE PRUEBAS DE VOLUMEN DE HEAP\n\n");
 
-    int array_prueba[4321];
-    for (int i = 0; i < 4321; i++) {
+    int array_prueba[CANT_ELEM_ARRAY_VOLUMEN];
+    for (int i = 0; i < CANT_ELEM_ARRAY_VOLUMEN; i++) {
         array_prueba[i] = i;
     }
 
@@ -136,7 +140,7 @@ void pruebas_heap_volumen() {
     print_test("El heap fue creado", heap != NULL);
 
     int contador_errores = 0;
-    for (int i = 0; i < 4321; i++) {
+    for (int i = 0; i < CANT_ELEM_ARRAY_VOLUMEN; i++) {
         if(!heap_encolar(heap,&array_prueba[i])) {
             contador_errores++;
         }
@@ -144,11 +148,11 @@ void pruebas_heap_volumen() {
 
     print_test("Se encolaron 4321 elementos correctamente", contador_errores == 0);
     print_test("Heap esta vacio es falso", !heap_esta_vacio(heap));
-    print_test("Heap cantidad es igual a 4321", heap_cantidad(heap) == 4321);
-    print_test("Ver max es igual al maximo elemento encolado", heap_ver_max(heap) == &array_prueba[4320]);
+    print_test("Heap cantidad es igual a 4321", heap_cantidad(heap) == CANT_ELEM_ARRAY_VOLUMEN);
+    print_test("Ver max es igual al maximo elemento encolado", heap_ver_max(heap) == &array_prueba[CANT_ELEM_ARRAY_VOLUMEN-1]);
 
     contador_errores = 0;
-    for (int i = 4320; i >= 0; i--) {
+    for (int i = CANT_ELEM_ARRAY_VOLUMEN-1; i >= 0; i--) {
         if(heap_desencolar(heap) != &array_prueba[i]) {
             contador_errores++;
         }
@@ -168,25 +172,25 @@ void pruebas_heap_volumen() {
 void pruebas_heap_desde_arreglo() {
     printf("\nINICIO DE PRUEBAS DE CREACION DE HEAP A PARTIR DE ARREGLO\n\n");
 
-    int array_prueba[123];
-    for (int i = 0; i < 123; i++) {
+    int array_prueba[CANT_ELEM_ARRAY_PRUEBAS];
+    for (int i = 0; i < CANT_ELEM_ARRAY_PRUEBAS; i++) {
         array_prueba[i] = i;
     }
 
-    void* array_punteros[123];
-    for (int i = 0; i < 123; i++) {
+    void* array_punteros[CANT_ELEM_ARRAY_PRUEBAS];
+    for (int i = 0; i < CANT_ELEM_ARRAY_PRUEBAS; i++) {
         array_punteros[i] = &array_prueba[i];
     }
 
-    heap_t* heap = heap_crear_arr(array_punteros, 123, (cmp_func_t)comparar_enteros);
+    heap_t* heap = heap_crear_arr(array_punteros, CANT_ELEM_ARRAY_PRUEBAS, (cmp_func_t)comparar_enteros);
 
     print_test("Se ha creado el heap a partir de un arreglo predefinido", heap != NULL);
     print_test("Heap esta vacio es false", !heap_esta_vacio(heap));
-    print_test("La cantidad de elementos es igual a la proporcionada a la hora de crear la funcion", heap_cantidad(heap) == 123);
-    print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == *(int*)array_punteros[122]);
+    print_test("La cantidad de elementos es igual a la proporcionada a la hora de crear la funcion", heap_cantidad(heap) == CANT_ELEM_ARRAY_PRUEBAS);
+    print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == *(int*)array_punteros[CANT_ELEM_ARRAY_PRUEBAS-1]);
 
     int contador_errores = 0;
-    for (int i = 122; i >= 0; i--) {
+    for (int i = CANT_ELEM_ARRAY_PRUEBAS-1; i >= 0; i--) {
         if(heap_desencolar(heap) != array_punteros[i]) {
             contador_errores++;
         }
@@ -205,15 +209,15 @@ void pruebas_heap_desde_arreglo() {
 
 void pruebas_heapsort() {
 
-    int enteros_orden_random[344];
+    int enteros_orden_random[CANT_ELEM_RANDOM];
 
 
-    for (int i = 0; i < 344; i++) {
+    for (int i = 0; i < CANT_ELEM_RANDOM; i++) {
         enteros_orden_random[i] = i;
     }
 
-    void* array_punteros_random[344];
-    for (int i = 0; i < 344; i++) {
+    void* array_punteros_random[CANT_ELEM_RANDOM];
+    for (int i = 0; i < CANT_ELEM_RANDOM; i++) {
         array_punteros_random[i] = &enteros_orden_random[i];
     }
 
@@ -224,29 +228,29 @@ void pruebas_heapsort() {
         array_punteros_char[i] = &array_chars[i];
     }
 
-    int enteros_ordenados_al_reves[456];
+    int enteros_ordenados_al_reves[CANT_ENTEROS_ORDENADOS];
 
-    for (int i = 0; i < 456; i++) {
+    for (int i = 0; i < CANT_ENTEROS_ORDENADOS; i++) {
         enteros_ordenados_al_reves[i] = 455-i;
     }
 
-    void* array_punteros_al_reves[456];
-    for (int i = 0; i < 456; i++) {
+    void* array_punteros_al_reves[CANT_ENTEROS_ORDENADOS];
+    for (int i = 0; i < CANT_ENTEROS_ORDENADOS; i++) {
         array_punteros_al_reves[i] = &enteros_ordenados_al_reves[i];
     }
 
     // Hago un shuffle de los numeros del array para que no queden en orden.
-    shuffle(enteros_orden_random, 344);
+    shuffle(enteros_orden_random, CANT_ELEM_RANDOM);
 
     printf("\nINICIO DE PRUEBAS DE HEAPSORT\n\n");
 
-    heap_sort(array_punteros_random, 344, (cmp_func_t)comparar_enteros);
+    heap_sort(array_punteros_random, CANT_ELEM_RANDOM, (cmp_func_t)comparar_enteros);
 
-    print_test("Se ordena un arreglo de enteros en orden aleatorio correctamente", esta_ordenado(array_punteros_random, (cmp_func_t )comparar_enteros, 343));
+    print_test("Se ordena un arreglo de enteros en orden aleatorio correctamente", esta_ordenado(array_punteros_random, (cmp_func_t )comparar_enteros, CANT_ELEM_RANDOM-1));
 
-    heap_sort(array_punteros_al_reves, 456, (cmp_func_t)comparar_enteros);
+    heap_sort(array_punteros_al_reves, CANT_ENTEROS_ORDENADOS, (cmp_func_t)comparar_enteros);
 
-    print_test("Se ordeno un arreglo de enteros originalmente ordenado de mayor a menor", esta_ordenado(array_punteros_al_reves, (cmp_func_t)comparar_enteros, 456));
+    print_test("Se ordeno un arreglo de enteros originalmente ordenado de mayor a menor", esta_ordenado(array_punteros_al_reves, (cmp_func_t)comparar_enteros, CANT_ENTEROS_ORDENADOS));
 
     heap_sort(array_punteros_char, sizeof(array_chars), (cmp_func_t)strcmp);
 
@@ -261,7 +265,7 @@ void pruebas_destruccion() {
 
     char** array_char_pruebas = split("hola hola cosa la la la ala d ac ac kekd eadkaed ea dea d kaedk eakd kaedkaek dkaed", ' ');
 
-    heap_t* heap = heap_crear_arr((void**)array_char_pruebas, 19, (cmp_func_t)strcmp);
+    heap_t* heap = heap_crear_arr((void**)array_char_pruebas, CANT_ELEM_PRUEBAS_DESTRUIR, (cmp_func_t)strcmp);
 
     print_test("Se creo un heap con los valores pasados", heap != NULL);
 

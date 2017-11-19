@@ -6,6 +6,8 @@
 
 
 #define TAM_INICIAL 32
+#define FACTOR_AUMENTAR_TAMANIO 2
+#define FACTOR_DISIMINUIR_TAMANIO 4
 
 /*******************************************************************
  *                DEFINICION DE LOS TIPOS DE DATOS                 *
@@ -81,8 +83,9 @@ void downheap(void* arreglo[], size_t indice, size_t cantidad, cmp_func_t compar
 
 //Convierte el arreglo en un heap de maximos.
 void heapify(void* arreglo[], size_t cantidad, cmp_func_t comparar){
-	for(size_t i = (cantidad-1)/2; i>=0 && i < cantidad ;i--){
-        downheap(arreglo,i,cantidad, comparar);
+	
+	for(size_t indice = cantidad/2 ; indice > 0; indice--){
+		downheap(arreglo,indice-1,cantidad,comparar);		
 	}
 }
 
@@ -179,7 +182,7 @@ bool heap_encolar(heap_t *heap, void *elem){
     if (elem == NULL) return false;
 
 	if(heap->cantidad >= heap->tamanio){
-		if(!heap_redimensionar(heap, heap->tamanio*2)) return false;
+		if(!heap_redimensionar(heap, heap->tamanio*FACTOR_AUMENTAR_TAMANIO)) return false;
 	}
 	if(heap_esta_vacio(heap)) heap->arreglo[0] = elem;
 	else{
@@ -212,8 +215,8 @@ void *heap_desencolar(heap_t *heap){
 	void* dato_a_devolver = heap->arreglo[0];
 	heap->arreglo[0] = heap->arreglo[heap->cantidad-1]; //Piso el primero por el ultimo
 	downheap(heap->arreglo,0,heap->cantidad-1,heap->comparar);
-	if(heap->cantidad <= heap->tamanio/4 && heap->tamanio/2 >= TAM_INICIAL){
-		if(!heap_redimensionar(heap, heap->tamanio/2)) return NULL;
+	if(heap->cantidad <= heap->tamanio/FACTOR_DISIMINUIR_TAMANIO && heap->tamanio/FACTOR_AUMENTAR_TAMANIO >= TAM_INICIAL){
+		if(!heap_redimensionar(heap, heap->tamanio/FACTOR_AUMENTAR_TAMANIO)) return NULL;
 	}
 	heap->cantidad--;
 	return dato_a_devolver;
