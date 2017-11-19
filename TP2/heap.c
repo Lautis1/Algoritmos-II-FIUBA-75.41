@@ -81,7 +81,7 @@ void downheap(void* arreglo[], size_t indice, size_t cantidad, cmp_func_t compar
 
 //Convierte el arreglo en un heap de maximos.
 void heapify(void* arreglo[], size_t cantidad, cmp_func_t comparar){
-	for(size_t i = (cantidad-1)/2; i>=0 && i < cantidad ;i--){
+	for(size_t i = (cantidad-1)/2; i < cantidad ;i--){
         downheap(arreglo,i,cantidad, comparar);
 	}
 }

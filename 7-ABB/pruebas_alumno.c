@@ -5,6 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+static void swap(void* array[], size_t p1, size_t p2)
+{
+	void* temp = array[p1];
+	array[p1] = array[p2];
+	array[p2] = temp;
+}
+
 
 /* ******************************************************************
  *                   PRUEBAS UNITARIAS ALUMNO
@@ -58,52 +67,62 @@ void prueba_algunos_elementos(){
 
 }
 
-void prueba_muchos_elementos(size_t largo){
-	fputs("### INICIO DE PRUEBAS CON MUCHOS ELEMENTOS ###\n",stdout);
-	//Inserto 'cantidad_elementos' veces el mismo par clave,valor
-	abb_t* arbol4 = abb_crear(strcmp,NULL);
-	//FUNCION EXTRAIDA DE LAS PRUEBAS DE LA CATEDRA DEL HASH.
-	const size_t largo_clave = 10;
-    char (*claves)[largo_clave] = malloc(largo * largo_clave);
+static void prueba_muchos_elementos(size_t largo) {
+    fputs("### INICIO DE PRUEBAS CON MUCHOS ELEMENTOS ###\n",stdout);
+    //Inserto 'cantidad_elementos' veces el mismo par clave,valor
+    abb_t* arbol4 = abb_crear(strcmp,free);
+
+    const size_t largo_clave = 10;
+    char* claves[largo];
     unsigned* valores[largo];
     bool ok = true;
+
     for (unsigned i = 0; i < largo; i++) {
-        valores[i] = malloc(sizeof(int));
+        claves[i] = malloc(largo_clave);
+        valores[i] = malloc(sizeof(unsigned));
         sprintf(claves[i], "%08d", i);
         *valores[i] = i;
+    }
+
+    srand((unsigned int) time(NULL));
+
+    for(int i = (int) (largo - 1); i >= 0; i--) {
+        unsigned int j = rand() % (i+1);
+        swap((void**) claves, i, j);
+    }
+
+    for (unsigned i = 0; i < largo; i++) {
         ok = abb_guardar(arbol4, claves[i], valores[i]);
         if (!ok) break;
-    
     }
+
     print_test("Se insertaron muchos elementos", ok);
-	print_test("Cantidad es largo", abb_cantidad(arbol4)==largo);
-	bool pertenece;
-	for(size_t j=0; j<largo;j++){
-		pertenece = abb_pertenece(arbol4,claves[j]);
-	}
-	print_test("Las claves pertenecen",pertenece);
-	bool obtener;
-	for(size_t x=0;x<largo;x++){
-		obtener = abb_obtener(arbol4,claves[x])==valores[x];
-	}
-	print_test("Obtener devuelve valores correctos", obtener);
-	bool borrados = true;
-	for(size_t i=0;i<largo;i++){
-		borrados = abb_borrar(arbol4,claves[i])==valores[i];
-	}
-	print_test("Se borraron 'largo' elementos", borrados);
-	print_test("Cantidad es 0", abb_cantidad(arbol4)==0);
-	abb_destruir(arbol4); //No se destruyen los datos, creo otro arbol que si destruye
-	abb_t* abb = abb_crear(strcmp, free);
-    ok = true;
-    for (size_t i = 0; i < largo; i++) {
-        ok = abb_guardar(abb, claves[i], valores[i]);
-        if (!ok) break;
+    print_test("Cantidad es largo", abb_cantidad(arbol4)==largo);
+    bool pertenece;
+    for(size_t j=0; j<largo;j++) {
+        pertenece = abb_pertenece(arbol4,claves[j]);
     }
-    free(claves);
+    print_test("Las claves pertenecen",pertenece);
+    bool obtener;
+    for(size_t x=0;x<largo;x++) {
+        obtener = abb_obtener(arbol4,claves[x])==valores[x];
+    }
+    print_test("Obtener devuelve valores correctos", obtener);
+    bool borrados = true;
+    for(size_t i=0;i<largo;i++) {
+        borrados = abb_borrar(arbol4,claves[i])==valores[i];
+    }
+    print_test("Se borraron 'largo' elementos", borrados);
+    print_test("Cantidad es 0", abb_cantidad(arbol4)==0);
+    abb_destruir(arbol4); //No se destruyen los datos, creo otro arbol que si destruye
+
     print_test("Destruir", true);
-    abb_destruir(abb);
-	printf("\n");
+
+    for (unsigned i = 0; i < largo; i++) {
+        free(valores[i]);
+        free(claves[i]);
+    }
+    printf("\n");
 
 }
 
@@ -150,37 +169,53 @@ void pruebas_iter_algunos_elementos(){
 	printf("\n");
 }
 
-void pruebas_iterar_volumen(size_t largo){
-	//USO LA FUNCION DE LAS PRUEBAS DE LA CATEDRA DEL HASH
-	fputs("### INICIO DE PRUEBAS CON ITER VOLUMEN ###\n",stdout);
-	abb_t* arbol7 = abb_crear(strcmp,free);
-	const size_t largo_clave = 10;
-    char (*claves)[largo_clave] = malloc(largo * largo_clave);
+static void pruebas_iterar_volumen(size_t largo) {
+    fputs("### INICIO DE PRUEBAS CON ITER VOLUMEN ###\n",stdout);
+    abb_t* arbol7 = abb_crear(strcmp,free);
+
+    const size_t largo_clave = 10;
+    char* claves[largo];
     unsigned* valores[largo];
     bool ok = true;
+
     for (unsigned i = 0; i < largo; i++) {
-        valores[i] = malloc(sizeof(int));
+        claves[i] = malloc(largo_clave);
+        valores[i] = malloc(sizeof(unsigned));
         sprintf(claves[i], "%08d", i);
         *valores[i] = i;
+    }
+
+    srand((unsigned int) time(NULL));
+
+    // Mezclamos el array: algoritmo de Fisher–Yates
+    for(int i = (int) (largo - 1); i >= 0; i--) {
+        unsigned int j = rand() % (i+1);
+        swap((void**) claves, i, j);
+    }
+
+    for (unsigned i = 0; i < largo; i++) {
         ok = abb_guardar(arbol7, claves[i], valores[i]);
         if (!ok) break;
     }
-    print_test("Se insertaron muchos elementos", ok);
-	print_test("Cantidad es largo", abb_cantidad(arbol7)==largo);
-	abb_iter_t* iter3 = abb_iter_in_crear(arbol7);
-	print_test("Se creo un iterador", iter3 != NULL);
-	bool avance;
-	for(size_t j= 0; j<largo;j++){
-		avance = abb_iter_in_avanzar(iter3);
-	}
-	print_test("Iter avanzo 'largo' veces", avance);
-	print_test("Iter esta al final", abb_iter_in_al_final(iter3));
-	abb_iter_in_destruir(iter3);
-	free(claves);
-	abb_destruir(arbol7);
-	printf("\n");
 
+    print_test("Se insertaron muchos elementos", ok);
+    print_test("Cantidad es largo", abb_cantidad(arbol7)==largo);
+    abb_iter_t* iter3 = abb_iter_in_crear(arbol7);
+    print_test("Se creo un iterador", iter3 != NULL);
+    bool avance;
+    for(size_t j= 0; j<largo;j++){
+        avance = abb_iter_in_avanzar(iter3);
+    }
+    print_test("Iter avanzo 'largo' veces", avance);
+    print_test("Iter esta al final", abb_iter_in_al_final(iter3));
+    abb_iter_in_destruir(iter3);
+    abb_destruir(arbol7);
+
+    for (unsigned i = 0; i < largo; i++) {
+        free(claves[i]);
+    }
 }
+
 bool contar_datos(const char* clave, void* valor, void* extra){
 	
 	size_t* num = extra;

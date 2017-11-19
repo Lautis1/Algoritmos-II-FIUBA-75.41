@@ -19,8 +19,7 @@
 #define TAM_BUFFER 300
 
 /**************************************************************************************/
-//Funcion que recibe un arbol de visitantes y un hash con los recursos mas solicitados del log.
-//Lee por entrada standard lo que ingresa el usuario y llama a la funcion que procesa esos datos.
+
 void recibir_comandos(abb_t* visitantes, hash_t* recursos_mas_solicitados) {
     
     char str[TAM_BUFFER];
@@ -30,20 +29,6 @@ void recibir_comandos(abb_t* visitantes, hash_t* recursos_mas_solicitados) {
         quitar_caracter_new_line(str);
     }
     while (estado != NULL && procesar_entrada_stdin(str, visitantes, recursos_mas_solicitados) == 0);
-}
-
-//Funcion que itera un hash, aplicandole la funcion visitar a cada item.
-void iterar_hash(hash_t* hash, void visitar(const char* clave, void *dato, void *extra), void *extra) {
-    
-    hash_iter_t* iter_hash = hash_iter_crear(hash);
-    if(iter_hash == NULL) return;
-    while (!hash_iter_al_final(iter_hash)) {
-        char* clave_actual = (char*)hash_iter_ver_actual(iter_hash);
-        void* dato_actual = hash_obtener(hash, clave_actual);
-        visitar(clave_actual, dato_actual, extra);
-        hash_iter_avanzar(iter_hash);
-    }
-    hash_iter_destruir(iter_hash);
 }
 
 /*FUNCION AUXILIAR*/
@@ -73,11 +58,9 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* visitantes, hash_t* recur
 	char** input = split(linea_entrada,' ');
 	int indice_corte = 0;
 	if(strcmp(input[0],AGREGAR_ARCHIVO) == 0){
-		if(contar_cantidad_parametros(input) == CANT_PARAM_AGREGAR){
-			if(!procesar_log(input[1],recursos_mas_solicitados, visitantes)){
-				imprimir_error(AGREGAR_ARCHIVO);
-				indice_corte = -1;
-			}
+		if(contar_cantidad_parametros(input) != CANT_PARAM_AGREGAR || !procesar_log(input[1],recursos_mas_solicitados, visitantes)){
+            imprimir_error(AGREGAR_ARCHIVO);
+            indice_corte = -1;
 		}
 	}
 	else if(strcmp(input[0],VISITADOS)==0){
@@ -106,4 +89,17 @@ int procesar_entrada_stdin(char* linea_entrada, abb_t* visitantes, hash_t* recur
 	if(indice_corte >= 0) fprintf(stdout, "OK\n");
 	return indice_corte;
 
+}
+
+//Recibe una cadena y reemplaza el caracter de salto de linea
+//por el caracter de fin de cadena.
+void quitar_caracter_new_line(char* cadena) {
+
+    int i = 0;
+    while (cadena[i] != '\0') {
+        if (cadena[i] == '\n') {
+            cadena[i] = '\0';
+        }
+        i++;
+    }
 }

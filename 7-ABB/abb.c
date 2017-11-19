@@ -51,6 +51,7 @@ nodo_abb_t* crear_nodo(const char* clave, void* valor) {
 	nodo->izq = NULL;
 	nodo->der = NULL;
 	return nodo;
+
 }
 
 // Nodo fue creado.
@@ -106,6 +107,7 @@ bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato)
 // Devuelve el nodo y no el valor asi despues puedo usar la funcion tanto para abb_borrar como para obtener.
 nodo_abb_t* buscar_nodo_por_clave(const abb_t* arbol, nodo_abb_t* nodo, const char* clave) {
 
+    if (arbol->cantidad == 0) return NULL;
     if (arbol->cmp(clave, nodo->clave) == 0) return nodo;
     else if (arbol->cmp(clave, nodo->clave) > 0) {
         if (nodo->der != NULL) {
@@ -253,7 +255,6 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
 //Post: Devuelve el valor del nodo.
 void *abb_obtener(const abb_t *arbol, const char *clave) {
 
-    if (!arbol || arbol->cantidad == 0) return NULL;
     nodo_abb_t* nodo_aux = buscar_nodo_por_clave(arbol, arbol->raiz, clave);
     return (nodo_aux == NULL ? NULL : nodo_aux->valor);
 }
@@ -262,7 +263,6 @@ void *abb_obtener(const abb_t *arbol, const char *clave) {
 //existe un nodo con esa clave.
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
     
-    if (!arbol || arbol->cantidad == 0) return false;
     return buscar_nodo_por_clave(arbol, arbol->raiz, clave) != NULL;
 }
 

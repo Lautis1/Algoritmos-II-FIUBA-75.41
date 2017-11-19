@@ -14,15 +14,12 @@ recurso_t* crear_recurso(char* nombre_recurso) {
     return recurso;
 }
 
-//Dado un hash, el cual contiene los recursos mas solicitados del log,
-//devuelve true o false dependiendo de si la operacion de aumentar la cantidad
-//de solicitudes de cierto recurso se efectuo correctamente.
 bool aumenta_cont_solicitudes_recurso(hash_t* recursos_mas_solicitados, char* nombre_recurso) {
 
     if (!hash_pertenece(recursos_mas_solicitados, nombre_recurso)) {
 
         recurso_t* recurso = crear_recurso(nombre_recurso);
-        if (recurso == NULL) return NULL;
+        if (recurso == NULL) return false;
         hash_guardar(recursos_mas_solicitados, nombre_recurso, recurso);
     }
     ((recurso_t *) (hash_obtener(recursos_mas_solicitados, nombre_recurso)))->cant_de_solicitudes++;
@@ -30,8 +27,6 @@ bool aumenta_cont_solicitudes_recurso(hash_t* recursos_mas_solicitados, char* no
     return true;
 }
 
-//Funcion de comparacion de recurso_t.
-//Devuelve 1 si el recurso1 es mayor a recurso2; -1 en viceversa; 0 si coinciden.
 int comparar_recursos(recurso_t* recurso1, recurso_t* recurso2){
 
     //Comparo la cantidad de solicitudes de cada recurso
@@ -55,4 +50,41 @@ void destruir_recurso(recurso_t* recurso) {
 void wrapper_destruir_recurso(void* dato) {
     recurso_t* recurso = dato;
     destruir_recurso(recurso);
+}
+
+//Dado un heap temporal de recursos y una cantidad "N", imprime por pantalla los
+//N sitios mas visitados de la pagina.
+void mostrar_n_recursos(heap_t* recursos_temp, int cantidad_de_recursos_a_mostrar) {
+
+    if(cantidad_de_recursos_a_mostrar == 0) return;
+
+    recurso_t* sitio_visitado = (recurso_t*)heap_desencolar(recursos_temp);
+    if (sitio_visitado == NULL) return;
+
+    mostrar_n_recursos(recursos_temp,cantidad_de_recursos_a_mostrar-1);
+    printf("\t%s - %d\n", sitio_visitado->clave, sitio_visitado->cant_de_solicitudes);
+}
+
+
+void pasar_top_k_de_hash_a_heap(hash_t* hash, heap_t* heap, int k) {
+
+    hash_iter_t* iter_hash = hash_iter_crear(hash);
+    if(iter_hash == NULL) return;
+
+    for (int i = 0; i < k && !hash_iter_al_final(iter_hash); i++) {
+        char* clave_actual = (char*)hash_iter_ver_actual(iter_hash);
+        recurso_t* recurso_actual = hash_obtener(hash, clave_actual);
+        heap_encolar(heap, recurso_actual);
+        hash_iter_avanzar(iter_hash);
+    }
+    while (!hash_iter_al_final(iter_hash)) {
+        char* clave_actual = (char*)hash_iter_ver_actual(iter_hash);
+        recurso_t* recurso_actual = hash_obtener(hash, clave_actual);
+        if (comparar_recursos((recurso_t*)heap_ver_max(heap), recurso_actual) > 0) {
+            heap_desencolar(heap);
+            heap_encolar(heap, recurso_actual);
+        }
+        hash_iter_avanzar(iter_hash);
+    }
+    hash_iter_destruir(iter_hash);
 }
