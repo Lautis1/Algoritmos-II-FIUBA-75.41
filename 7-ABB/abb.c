@@ -27,9 +27,7 @@ struct abb{
 
 
 struct abb_iter{
-	abb_t* arbol;
 	pila_t* pila;
-	nodo_abb_t* actual;
 };
 
 /* ******************************************************************
@@ -367,7 +365,6 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){ //APILAR RAIZ Y TODOS LOS H.I
 	iter->pila = pila;
 	nodo_abb_t* nodo = arbol->raiz;
 	apilar_nodos_izq(iter,nodo);
-	iter->actual = pila_desapilar(iter->pila);
 	return iter;
 }
 
@@ -377,10 +374,10 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){ //APILAR RAIZ Y TODOS LOS H.I
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
 
 	if(abb_iter_in_al_final(iter)) return false;
-	if(iter->actual->der){
-		apilar_nodos_izq(iter,iter->actual->der);
+    nodo_abb_t* actual = pila_desapilar(iter->pila);
+	if(actual->der) {
+		apilar_nodos_izq(iter,actual->der);
 	}
-    iter->actual = pila_desapilar(iter->pila);
 	return true;
 }
 
@@ -388,14 +385,14 @@ bool abb_iter_in_avanzar(abb_iter_t *iter) {
 //final del arbol o no.
 bool abb_iter_in_al_final(const abb_iter_t *iter){
 	
-	return(iter->actual == NULL);
+	return(pila_esta_vacia(iter->pila));
 }
 
 //Devuelve la clave a la que apunta el iterador.
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-    if (iter->actual == NULL) return NULL;
+    if (abb_iter_in_al_final(iter)) return NULL;
 
-	return iter->actual->clave;
+	return ((nodo_abb_t*)pila_ver_tope(iter->pila))->clave;
 }
 
 //Destruye el iterador y su pila.
