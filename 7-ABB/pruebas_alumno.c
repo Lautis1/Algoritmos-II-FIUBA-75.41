@@ -159,10 +159,11 @@ void pruebas_iter_algunos_elementos(){
 	print_test("Iter no esta al final", !abb_iter_in_al_final(iter2));
 	print_test("Ver actual es '2'", atoi(abb_iter_in_ver_actual(iter2))==atoi(claves[1]));
 	abb_iter_in_avanzar(iter2);
-	abb_iter_in_avanzar(iter2);
-	abb_iter_in_avanzar(iter2);
-	abb_iter_in_avanzar(iter2);
-	print_test("Avanza el iterado, Esta al final", abb_iter_in_al_final(iter2));
+    abb_iter_in_avanzar(iter2);
+    abb_iter_in_avanzar(iter2);
+    abb_iter_in_avanzar(iter2);
+
+    print_test("Avanza el iterado, Esta al final", abb_iter_in_al_final(iter2));
 	abb_iter_in_destruir(iter2);
 	abb_destruir(arbol6);
 	print_test("Arbol e iter destruidos",true);

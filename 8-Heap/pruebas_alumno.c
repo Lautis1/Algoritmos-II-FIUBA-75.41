@@ -26,11 +26,10 @@ bool esta_ordenado(void** elementos, cmp_func_t cmp, size_t cant) {
     return true;
 }
 
-void shuffle(int *array, size_t n){
-    
-    if (n > 1){
+void shuffle(int *array, size_t n) {
+    if (n > 1) {
         size_t i;
-        for (i = 0; i < n - 1; i++){
+        for (i = 0; i < n - 1; i++) {
             size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
             int t = array[j];
             array[j] = array[i];
@@ -135,6 +134,8 @@ void pruebas_heap_volumen() {
         array_prueba[i] = i;
     }
 
+    shuffle(array_prueba, CANT_ELEM_ARRAY_VOLUMEN);
+
     heap_t* heap = heap_crear((cmp_func_t)comparar_enteros);
 
     print_test("El heap fue creado", heap != NULL);
@@ -149,11 +150,12 @@ void pruebas_heap_volumen() {
     print_test("Se encolaron 4321 elementos correctamente", contador_errores == 0);
     print_test("Heap esta vacio es falso", !heap_esta_vacio(heap));
     print_test("Heap cantidad es igual a 4321", heap_cantidad(heap) == CANT_ELEM_ARRAY_VOLUMEN);
-    print_test("Ver max es igual al maximo elemento encolado", heap_ver_max(heap) == &array_prueba[CANT_ELEM_ARRAY_VOLUMEN-1]);
+    printf("%d\n", (*(int*)heap_ver_max(heap)));
+    print_test("Ver max es igual al maximo elemento encolado", (*(int*)heap_ver_max(heap)) == CANT_ELEM_ARRAY_VOLUMEN-1);
 
     contador_errores = 0;
     for (int i = CANT_ELEM_ARRAY_VOLUMEN-1; i >= 0; i--) {
-        if(heap_desencolar(heap) != &array_prueba[i]) {
+        if((*(int*)heap_desencolar(heap)) != i) {
             contador_errores++;
         }
     }
@@ -177,6 +179,8 @@ void pruebas_heap_desde_arreglo() {
         array_prueba[i] = i;
     }
 
+    shuffle(array_prueba, CANT_ELEM_ARRAY_PRUEBAS);
+
     void* array_punteros[CANT_ELEM_ARRAY_PRUEBAS];
     for (int i = 0; i < CANT_ELEM_ARRAY_PRUEBAS; i++) {
         array_punteros[i] = &array_prueba[i];
@@ -187,11 +191,11 @@ void pruebas_heap_desde_arreglo() {
     print_test("Se ha creado el heap a partir de un arreglo predefinido", heap != NULL);
     print_test("Heap esta vacio es false", !heap_esta_vacio(heap));
     print_test("La cantidad de elementos es igual a la proporcionada a la hora de crear la funcion", heap_cantidad(heap) == CANT_ELEM_ARRAY_PRUEBAS);
-    print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == *(int*)array_punteros[CANT_ELEM_ARRAY_PRUEBAS-1]);
+    print_test("Ver max es igual al mayor elemento del arreglo original", *(int*)heap_ver_max(heap) == CANT_ELEM_ARRAY_PRUEBAS-1);
 
     int contador_errores = 0;
     for (int i = CANT_ELEM_ARRAY_PRUEBAS-1; i >= 0; i--) {
-        if(heap_desencolar(heap) != array_punteros[i]) {
+        if((*(int*)heap_desencolar(heap)) != i) {
             contador_errores++;
         }
     }
@@ -210,7 +214,6 @@ void pruebas_heap_desde_arreglo() {
 void pruebas_heapsort() {
 
     int enteros_orden_random[CANT_ELEM_RANDOM];
-
 
     for (int i = 0; i < CANT_ELEM_RANDOM; i++) {
         enteros_orden_random[i] = i;
