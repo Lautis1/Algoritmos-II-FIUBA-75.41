@@ -1,86 +1,85 @@
-#LIBRERIA DE FUNCIONES DE GRAFO PARA IMPLEMENTAR PARA TP3
+# LIBRERIA DE FUNCIONES DE GRAFO PARA IMPLEMENTAR PARA TP3
 
 from collections import deque
+from collections import defaultdict
 from grafo import *
 import csv
 
 ESTADO_VISITADO = True
 ESTADO_NO_VISITADO = False
 
-#Recorridos de grafos
 
-def BreathFirstSearch(grafo, vertice_origen):
+# Recorridos de grafos
 
-	vertices_visitados = {}
-	padre_vertice = {}
-	orden_vertice = {}
-	cola = deque()
-	cola.append(vertice_origen)
-	vertices_visitados[vertice_origen] = ESTADO_VISITADO
-	padre_vertice[vertice_origen] = None
-	orden_vertice[vertice_origen] = 0
-	while not len(cola) == 0:
-		nuevo_vertice = cola.pop()
-		for v_ady in grafo.obtener_adyacentes(nuevo_vertice):
-			if vertices_visitados[v_ady] == ESTADO_NO_VISITADO:
-				vertices_visitados[v_ady] = ESTADO_VISITADO
-				padre_vertice[v_ady] = nuevo_vertice
-				orden_vertice[v_ady] = orden_vertice[nuevo_vertice] + 1
-				cola.append(v_ady)
-
-
-
-def DepthFirstSearch(grafo):
-
-	vertices_visitados = {}
-	padre_vertice = {}
-	orden_vertice = {}
-	for vertice in grafo.obtener_vertices():
-		if vertices_visitados[vertice] == ESTADO_NO_VISITADO:
-			padre_vertice[vertice] = None
-			orden_vertice[vertice] = 0
-			dfs_visitar(grafo, vertice, vertices_visitados, padre_vertice, orden_vertice)
+def breathfirstsearch(grafo, vertice_origen):
+    vertices_visitados = {}
+    padre_vertice = {}
+    orden_vertice = {}
+    cola = deque()
+    cola.append(vertice_origen)
+    vertices_visitados[vertice_origen] = ESTADO_VISITADO
+    padre_vertice[vertice_origen] = None
+    orden_vertice[vertice_origen] = 0
+    while not len(cola) == 0:
+        nuevo_vertice = cola.pop()
+        for v_ady in grafo.obtener_adyacentes(nuevo_vertice):
+            if vertices_visitados[v_ady] == ESTADO_NO_VISITADO:
+                vertices_visitados[v_ady] = ESTADO_VISITADO
+                padre_vertice[v_ady] = nuevo_vertice
+                orden_vertice[v_ady] = orden_vertice[nuevo_vertice] + 1
+                cola.append(v_ady)
 
 
-def dfs_visitar(grafo,origen, dicc_vertices_visitados, dicc_padres, dicc_orden):
+def depthfirstsearch(grafo):
+    vertices_visitados = {}
+    padre_vertice = {}
+    orden_vertice = {}
+    for vertice in grafo.obtener_vertices():
+        if vertices_visitados[vertice] == ESTADO_NO_VISITADO:
+            padre_vertice[vertice] = None
+            orden_vertice[vertice] = 0
+            dfs_visitar(grafo, vertice, vertices_visitados, padre_vertice, orden_vertice)
 
-	dicc_vertices_visitados[origen] = ESTADO_VISITADO
-	for v_ady in grafo.obtener_adyacentes(origen):
-		if dicc_vertices_visitados[v_ady] == ESTADO_NO_VISITADO:
-			dicc_padres[v_ady] = origen
-			dicc_orden[v_ady] = dicc_orden[origen] + 1
-			dfs_visitar(grafo,v_ady,dicc_vertices_visitados,dicc_padres,dicc_orden)
 
-#CAMINO MINIMO = DIJKSTRA
+def dfs_visitar(grafo, origen, dicc_vertices_visitados, dicc_padres, dicc_orden):
+    dicc_vertices_visitados[origen] = ESTADO_VISITADO
+    for v_ady in grafo.obtener_adyacentes(origen):
+        if dicc_vertices_visitados[v_ady] == ESTADO_NO_VISITADO:
+            dicc_padres[v_ady] = origen
+            dicc_orden[v_ady] = dicc_orden[origen] + 1
+            dfs_visitar(grafo, v_ady, dicc_vertices_visitados, dicc_padres, dicc_orden)
+
+
+# CAMINO MINIMO = DIJKSTRA
 
 def camino_minimo(grafo, origen, destino):
+    """Recorre el grafo con BFS para buscar el camino minimo entre dos vertices.
+    Devuelve una lista con el camino, None en caso que no haya camino."""
 
-	"""Recorre el grafo con BFS para buscar el camino minimo entre dos vertices.
-	Devuelve una lista con el camino, None en caso que no haya camino."""
+    cola = deque()
+    vertices_visitados = {}
+    padre_vertices = {}
+    orden_vertices = {}
 
-	cola = deque()
-	vertices_visitados = {}
-	padre_vertices = {}
-	orden_vertices = {}
-
-	#Recorro cada vertice del grafo y lo marco como NO visitado, y sin padre
-	for vertice in grafo.obtener_vertices():
-		vertices_visitados[vertice] = ESTADO_NO_VISITADO
-		padre_vertices[vertice] = None
-	cola.append(origen)
-	vertices_visitados[origen] = ESTADO_VISITADO
-	padre_vertices[origen] = None
-	orden_vertices[origen] = 0
-	while len(cola) > 0:
-		v_actual = cola.pop()
-		if v_actual == destino: return padre_vertices,orden_vertices
-		for v_ady in grafo.obtener_adyacentes(v_actual):
-			if not v_ady in vertices_visitados:
-				vertices_visitados[v_ady] = ESTADO_VISITADO
-				padre_vertices[v_ady] = v_actual
-				orden_vertices[v_ady] = orden_vertices[v_actual] + 1
-				cola.append(v_ady)
-	return padre_vertices,orden_vertices
+    # Recorro cada vertice del grafo y lo marco como NO visitado, y sin padre
+    for vertice in grafo.obtener_vertices():
+        vertices_visitados[vertice] = ESTADO_NO_VISITADO
+        padre_vertices[vertice] = None
+    cola.append(origen)
+    vertices_visitados[origen] = ESTADO_VISITADO
+    padre_vertices[origen] = None
+    orden_vertices[origen] = 0
+    while len(cola) > 0:
+        v_actual = cola.pop()
+        if v_actual == destino:
+            return padre_vertices, orden_vertices
+        for v_ady in grafo.obtener_adyacentes(v_actual):
+            if v_ady not in vertices_visitados:
+                vertices_visitados[v_ady] = ESTADO_VISITADO
+                padre_vertices[v_ady] = v_actual
+                orden_vertices[v_ady] = orden_vertices[v_actual] + 1
+                cola.append(v_ady)
+    return padre_vertices, orden_vertices
 
 
 #############################################
@@ -95,40 +94,39 @@ def grafo_crear(nombre_archivo):
     POST: Devuelve un grafo creado a partir de estos datos.
     """
     grafo = Grafo()
-    dicc_pelis = {}
+    dicc_pelis = defaultdict(list)  # Para ahorrarse el chequeo de ver si el dic tiene cierto elemento antes de agregar.
     with open(nombre_archivo) as actores:
-    	lector = csv.reader(actores)
-    	for linea in lector:
-    		actor = linea[0]
-    		peliculas = linea[1:]
-    		grafo.agregar_vertice(actor)
-    		for peli in peliculas:
-    			if not peli in dicc_pelis:
-    				dicc_pelis[peli] = [actor]
-    			else:
-    				dicc_pelis[peli].append(actor)
-    			for i in range(len(dicc_pelis[peli])-1):
-    				grafo.agregar_arista(dicc_pelis[peli][i], dicc_pelis[peli][i+1], peli)
+        lector = csv.reader(actores)
+        for linea in lector:
+            actor = linea[0]
+            peliculas = linea[1:]
+            grafo.agregar_vertice(actor)
+            for peli in peliculas:
+                dicc_pelis[peli].append(actor)
+        for pelicula in dicc_pelis:
+            for i in range(len(dicc_pelis[pelicula])):
+                for j in range(i + 1, len(dicc_pelis[pelicula])):
+                    grafo.agregar_arista(dicc_pelis[pelicula][i], dicc_pelis[pelicula][j], pelicula)
     return grafo
-    
-    #raise NotImplementedError
+
+    # raise NotImplementedError
+
+
 dicc = grafo_crear("test.csv")
-print(dicc)
 
-#print(dicc_peliculas)
 
-'''def camino(grafo, origen, llegada):
+def camino(grafo, origen, llegada):
     """
     Devuelve el camino entre un actor de origen y uno de llegada.
 
     PRE: Recibe el grafo, un actor de origen y un actor de llegada.
-    POST: Devuelve una lista ordenada de cadenas (películas) para llegar desde
-        el origen hasta el final.
+    POST: Devuelve una lista ordenada de cadenas (peliculas) para llegar desde
+    el origen hasta el final.
     """
 
-    padres_v, orden_v = camino_minimo(grafo,origen,llegada)
+    padres_v, orden_v = camino_minimo(grafo, origen, llegada)
     recorrido_minimo = []
-    v_actual = padres_v.get(llegada) #Devuelve ady de "llegada" o None si no tiene
+    v_actual = padres_v.get(llegada)  # Devuelve ady de "llegada" o None si no tiene
 
     raise NotImplementedError
 
@@ -137,7 +135,7 @@ def actores_a_distancia(grafo, origen, n):
     """
     Devuelve los actores a distancia n del recibido.
 
-    PRE: Recibe el grafo, el actor de origen y el número deseado.
+    PRE: Recibe el grafo, el actor de origen y el numero deseado.
     POST: Devuelve la lista de cadenas (actores) a n pasos del recibido.
     """
     raise NotImplementedError
@@ -151,22 +149,24 @@ def popularidad(grafo, actor):
     POST: Devuelve un entero que simboliza la popularidad: todos los adyacentes
         de los adyacentes del actor, multiplicado por su cantidad de peliculas
     """
-    raise NotImplementedError
+    if actor not in grafo.vertices:
+        return 0
+    peliculas_actor = set()
+    for actor_adyacente in grafo.vertices[actor]:
+        peliculas_actor.add(grafo.vertices[actor][actor_adyacente])
+    return len(grafo.vertices[actor]) * len(peliculas_actor)
 
 
 def similares(grafo,origen, n):
     """
-    Calcula los n actores más similares al actor de origen y los devuelve en una
+    Calcula los n actores mas similares al actor de origen y los devuelve en una
     lista ordenada de mayor similitud a menor.
 
     PRE: Recibe el grafo, el actor de origen, y el n deseado
-    POST: Devuelve una lista de los n actores no adyacentes más similares al
+    POST: Devuelve una lista de los n actores no adyacentes mas similares al
         pedido. La lista no debe contener al actor de origen.
     """
-    raise NotImplementedError'''
+    raise NotImplementedError
 
 
-
-
-
-
+print(popularidad(dicc, 'Alison Jeremy'))
