@@ -96,7 +96,6 @@ def grafo_crear(nombre_archivo):
     """
     grafo = Grafo()
     dicc_pelis = {}
-    lista_actores = []
     with open(nombre_archivo) as actores:
     	lector = csv.reader(actores)
     	for linea in lector:
@@ -105,12 +104,11 @@ def grafo_crear(nombre_archivo):
     		grafo.agregar_vertice(actor)
     		for peli in peliculas:
     			if not peli in dicc_pelis:
-    				lista_actores.append(actor)
-    				dicc_pelis[peli] = lista_actores
+    				dicc_pelis[peli] = [actor]
     			else:
-    				dicc_pelis[peli] += actor
-    			for i in range(len(lista_actores)-1):
-    				grafo.agregar_arista(lista_actores[i], lista_actores[i+1], peli)
+    				dicc_pelis[peli].append(actor)
+    			for i in range(len(dicc_pelis[peli])-1):
+    				grafo.agregar_arista(dicc_pelis[peli][i], dicc_pelis[peli][i+1], peli)
     return grafo
     
     #raise NotImplementedError
