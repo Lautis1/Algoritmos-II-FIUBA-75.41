@@ -3,6 +3,7 @@
 from collections import deque
 from collections import defaultdict
 from grafo import *
+import random
 import csv
 
 ESTADO_VISITADO = True
@@ -103,10 +104,10 @@ def grafo_crear(nombre_archivo):
             grafo.agregar_vertice(actor)
             for peli in peliculas:
                 dicc_pelis[peli].append(actor)
-        for pelicula in dicc_pelis:
-            for i in range(len(dicc_pelis[pelicula])):
-                for j in range(i + 1, len(dicc_pelis[pelicula])):
-                    grafo.agregar_arista(dicc_pelis[pelicula][i], dicc_pelis[pelicula][j], pelicula)
+    for pelicula in dicc_pelis:
+        for i in range(len(dicc_pelis[pelicula])):
+            for j in range(i + 1, len(dicc_pelis[pelicula])):
+                grafo.agregar_arista(dicc_pelis[pelicula][i], dicc_pelis[pelicula][j], pelicula)
     return grafo
 
     # raise NotImplementedError
@@ -152,12 +153,16 @@ def popularidad(grafo, actor):
     if actor not in grafo.vertices:
         return 0
     peliculas_actor = set()
+    actores_grado_dos = set()
     for actor_adyacente in grafo.vertices[actor]:
-        peliculas_actor.add(grafo.vertices[actor][actor_adyacente])
-    return len(grafo.vertices[actor]) * len(peliculas_actor)
+        for actor_grado_dos in grafo.vertices[actor_adyacente]:
+            actores_grado_dos.add(actor_grado_dos)
+        for pelis in grafo.vertices[actor][actor_adyacente]:
+            peliculas_actor.add(pelis)
+    return len(actores_grado_dos) * len(peliculas_actor)
 
 
-def similares(grafo,origen, n):
+def similares(grafo, origen, n):
     """
     Calcula los n actores mas similares al actor de origen y los devuelve en una
     lista ordenada de mayor similitud a menor.
@@ -166,7 +171,24 @@ def similares(grafo,origen, n):
     POST: Devuelve una lista de los n actores no adyacentes mas similares al
         pedido. La lista no debe contener al actor de origen.
     """
-    raise NotImplementedError
+    cantidad_de_caminatas = 1000
+    largo_caminata = 35  # Las cantidades estan son arbitrarias, despues vemos que cantidad va mejor.
+    actores_similares = defaultdict(int)
+
+    for i in range(cantidad_de_caminatas):
+        actor_actual = origen
+        for j in range(largo_caminata):
+            actor_actual = random.choice(list(grafo.vertices[actor_actual].keys()))
+            actores_similares[actor_actual] += 1
+
+    # Saco el actor de origen de el dict de actores_similares
+    if origen in actores_similares:
+        del actores_similares[origen]
+    # Ordeno en base a la cantidad de veces que la random_walk paso por cada actor.
+    lista_similares = sorted(actores_similares, key=actores_similares.get, reverse=True)
+
+    return lista_similares[0:n]
 
 
-print(popularidad(dicc, 'Alison Jeremy'))
+print(popularidad(dicc, 'Bacon Kevin'))
+print(similares(dicc, 'Bacon Kevin', 5))

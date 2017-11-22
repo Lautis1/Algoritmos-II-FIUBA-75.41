@@ -1,4 +1,4 @@
-
+from collections import defaultdict
 
 # ###################################################################################
 
@@ -15,7 +15,7 @@ class Grafo:
         lo agrega."""
         if nombre_vertice in self.vertices:
             return
-        self.vertices[nombre_vertice] = {}
+        self.vertices[nombre_vertice] = defaultdict(list)
 
     def eliminar_vertice(self, vertice_a_borrar):
         """Borra el vertice 'vertice_a_borrar' del grafo.
@@ -32,8 +32,8 @@ class Grafo:
         """Une los vertices recibidos mediante una arista a crear, cuyo nombre es
         el nombre recibido"""
 
-        self.vertices[vertice_origen][vertice_destino] = nombre
-        self.vertices[vertice_destino][vertice_origen] = nombre
+        self.vertices[vertice_origen][vertice_destino].append(nombre)
+        self.vertices[vertice_destino][vertice_origen].append(nombre)
         self.cantidad_aristas += 1
 
     def eliminar_arista(self, vertice_origen, vertice_destino):
