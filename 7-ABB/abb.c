@@ -62,44 +62,6 @@ void* destruir_nodo(nodo_abb_t* nodo) {
     free(nodo);
     return dato_aux;
 }
-//Funcion auxiliar para utilizar en abb_guardar
-bool abb_insertar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, void* dato) {
-
-    // Ya se chequeo si el arbol existe en abb_guardar, no hace falta revisar de nuevo.
-    if (arbol->cmp(clave, nodo->clave) == 0) {
-        if (arbol->destruir_dato) {
-            arbol->destruir_dato(nodo->valor);
-        }
-        nodo->valor = dato;
-    }
-        //Si me tengo que mover a la derecha es decir la clave que quiero insertar es mayor a la clave del nodo actual.
-    else if (arbol->cmp(clave, nodo->clave) > 0) {
-        if (nodo->der != NULL) {
-            return abb_insertar(arbol, nodo->der, clave, dato);
-        }
-        else {
-            nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
-            if (!nodo_aux) return false;
-            nodo->der = nodo_aux;
-            if (nodo_aux == NULL) return false;
-            nodo->der = nodo_aux;
-            arbol->cantidad++;
-        }
-    }
-        // Si me tengo que mover a la izq.
-    else {
-        if (nodo->izq != NULL) {
-            return abb_insertar(arbol, nodo->izq, clave, dato);
-        }
-        else {
-            nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
-            if (nodo_aux == NULL) return false;
-            nodo->izq = nodo_aux;
-            arbol->cantidad++;
-        }
-    }
-    return true;
-}
 
 
 // Devuelve el nodo y no el valor asi despues puedo usar la funcion tanto para abb_borrar como para obtener.
@@ -143,17 +105,6 @@ size_t cantidad_de_hijos(nodo_abb_t* nodo) {
     return 0;
 }
 
-//Intercambia el nodo que va a tomar el lugar del borrado con el borrado.
-void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
-
-	const char* clave_2 = nodo2->clave;
-	void* valor_2 = nodo2->valor;
-	nodo2->clave = nodo1->clave;
-	nodo2->valor = nodo1->valor;
-	nodo1->clave = clave_2;
-	nodo1->valor = valor_2;
-}
-
 // Pre: nodo existe
 nodo_abb_t* buscar_nodo_minimo(nodo_abb_t* nodo){
 
@@ -167,13 +118,13 @@ nodo_abb_t* buscar_nodo_minimo(nodo_abb_t* nodo){
 // Busca al padre del nodo correspondiente a la clave pasada por parametro.
 nodo_abb_t* buscar_nodo_padre(abb_t* arbol, nodo_abb_t* nodo, const char* clave) {
     if (arbol->cmp(clave, nodo->clave) < 0) {
-        if (arbol->cmp(clave, nodo->izq->clave) == 0) {
+        if (nodo->izq == NULL || arbol->cmp(clave, nodo->izq->clave) == 0) {
             return nodo;
         }
         return buscar_nodo_padre(arbol, nodo->izq, clave);
     }
     else {
-        if (arbol->cmp(clave, nodo->der->clave) == 0) {
+        if (nodo->der == NULL || arbol->cmp(clave, nodo->der->clave) == 0) {
             return nodo;
         }
         return buscar_nodo_padre(arbol, nodo->der, clave);
@@ -199,6 +150,18 @@ void* borrar(abb_t* arbol, nodo_abb_t* nodo, const char* clave, nodo_abb_t* reem
     arbol->cantidad--;
     return dato_aux;
 }
+
+//Intercambia el nodo que va a tomar el lugar del borrado con el borrado.
+void swapear_nodos(nodo_abb_t* nodo1, nodo_abb_t* nodo2){
+
+    const char* clave_2 = nodo2->clave;
+    void* valor_2 = nodo2->valor;
+    nodo2->clave = nodo1->clave;
+    nodo2->valor = nodo1->valor;
+    nodo1->clave = clave_2;
+    nodo1->valor = valor_2;
+}
+
 //Funcion auxiliar para borrar, se usa para borrar los nodos que tengan 2 hijos.
 void* borrar_dos_hijos(abb_t* arbol, const char* clave, nodo_abb_t* nodo) {
     nodo_abb_t* nodo_sucesor = buscar_nodo_minimo(nodo->der);
@@ -244,7 +207,22 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
         arbol->cantidad++;
         return true;
     } else {
-        return abb_insertar(arbol, arbol->raiz, clave, dato);
+        nodo_abb_t* padre = buscar_nodo_padre(arbol, arbol->raiz, clave);
+        nodo_abb_t* nodo_buscado = buscar_nodo_por_clave(arbol, arbol->raiz, clave);
+        if (nodo_buscado != NULL) {
+            if (arbol->destruir_dato) {
+                arbol->destruir_dato(nodo_buscado->valor);
+            }
+            nodo_buscado->valor = dato;
+        }
+        else {
+            int valor_comparacion = arbol->cmp(clave, padre->clave);
+            nodo_abb_t* nodo_aux = crear_nodo(clave, dato);
+            if (!nodo_aux) return false;
+            (valor_comparacion > 0) ? (padre->der = nodo_aux) : (padre->izq = nodo_aux);
+            arbol->cantidad++;
+        }
+        return true;
     }
 }
 
@@ -277,6 +255,7 @@ void abb_destruir(abb_t *arbol) {
     destruir_post_order(arbol->raiz, arbol->destruir_dato);
     free(arbol);
 }
+
 
 //Borra del abb el nodo que contenga la clave dada por parametro.
 //Pre: el abb fue creado.
