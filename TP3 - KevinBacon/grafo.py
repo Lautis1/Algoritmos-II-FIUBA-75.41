@@ -48,6 +48,8 @@ class Grafo:
     def obtener_adyacentes(self, vertice_padre):
         """Devuelve una lista de todos los vertices adyacentes al vertice recibido por
         parametro."""
+        if not vertice_padre in self.vertices:
+        	raise ValueError("Vertice no encontrado")
 
         return [ady for ady in self.vertices[vertice_padre]]
 
