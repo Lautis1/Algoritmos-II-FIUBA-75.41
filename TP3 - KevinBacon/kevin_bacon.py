@@ -3,9 +3,21 @@
 ###################################################################################
 from grafo import *
 from seis_grados import *
+import sys
+
+#Constantes de comandos para no hardcodear
+CAMINO_A_KB = "camino_hasta_KB"
+KBN = "bacon_number"
+KBN_MAYOR_6 = "bacon_number_mayor_a_6"
+KBN_INFINITO = "bacon_number_infinito"
+KBN_PROMEDIO = "KBN_promedio"
+KB_SIMILARES = "similares_a_KB"
+KB_POPULARIDAD = "popularidad_contra_KB"
+CANT_PELICULAS = "cantidad_peliculas"
+CANT_ACTORES = "cantidad_actores"
 
 
-def camino_hasta_KB(grafo, actor_origen):
+def camino_hasta_kb(grafo, actor_origen):
 	"""Imprime el camino mas corto con el cual se llega desde cualquier actor
 	hasta Kevin Bacon. De no haber camino posible, se debe imprimir un mensaje
 	acorde (por ejemplo: "No hay conexion entre KB y el actor") y devolverse
@@ -43,6 +55,8 @@ def bacon_number_mayor_a_6(grafo):
 	for vertice in orden:
 		if orden[vertice] > 6:
 			actores_kbn_mayor_a_6.append(vertice)
+	if len(actores_kbn_mayor_a_6) == 0:
+		print("No existen actores a mas de 6 pasos de Kevin Bacon")
 	return sorted(actores_kbn_mayor_a_6)
 
 def bacon_number_infinito(grafo):
@@ -76,6 +90,33 @@ def cantidad_actores(grafo):
 
 
 grafo = grafo_crear("test.csv")
-#print(camino_hasta_KB(grafo, "Eastwood Clint"))
+print(camino_hasta_KB(grafo, "Bacon Kevin"))
 #print(bacon_number(grafo, ""))
-print(bacon_number_mayor_a_6(grafo))
+#print(bacon_number_mayor_a_6(grafo))
+
+###################################################################################
+#                            INTERFAZ PARA EL USUARIO                             #
+###################################################################################
+
+def recibir_comandos(grafo, linea = input()):
+	"""Recibe el grafo principal y una lista de parametros ingresada por el usuario.
+	Efectua las operaciones correspondientes sobre dichos parametros."""
+	
+	lista_parametros = linea.split()
+	if lista_parametros[0] == CAMINO_A_KB:
+		camino_hasta_kb(grafo, lista_parametros[1])
+	else if lista_parametros[0] == KBN:
+		bacon_number(grafo, lista_parametros[1])
+	else if lista_parametros[0] == KBN_unMAYOR_6:
+		bacon_number_mayor_a_6(grafo)
+
+
+
+def main():
+	"""Recibe por entrada estandar el nombre del programa y el archivo a abrir.
+	Crea el grafo con ese archivo."""
+	grafo = grafo_crear(sys.argv[1])
+
+
+if __name__ == '__main__':
+	main()
