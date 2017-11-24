@@ -26,9 +26,9 @@ def breathfirstsearch(grafo, vertice_origen):
 	padre_vertice[vertice_origen] = None
 	orden_vertice[vertice_origen] = 0
 	while not len(cola) == 0:
-		nuevo_vertice = cola.pop()
+		nuevo_vertice = cola.popleft()
 		for v_ady in grafo.obtener_adyacentes(nuevo_vertice):
-			if not v_ady in vertices_visitados:
+			if v_ady not in vertices_visitados:
 				vertices_visitados[v_ady] = ESTADO_VISITADO
 				padre_vertice[v_ady] = nuevo_vertice
 				orden_vertice[v_ady] = orden_vertice[nuevo_vertice] + 1
@@ -73,7 +73,7 @@ def camino_minimo(grafo, origen, destino):
 	padre_vertices[origen] = None
 	orden_vertices[origen] = 0
 	while len(cola) > 0:
-		v_actual = cola.pop()
+		v_actual = cola.popleft()
 		if v_actual == destino:
 			return padre_vertices, orden_vertices
 		for v_ady in grafo.obtener_adyacentes(v_actual):

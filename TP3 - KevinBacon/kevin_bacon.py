@@ -4,6 +4,7 @@
 from grafo import *
 from seis_grados import *
 import sys
+from collections import defaultdict
 
 #Constantes de comandos para no hardcodear
 CAMINO_A_KB = "camino_hasta_KB"
@@ -16,7 +17,7 @@ KB_POPULARIDAD = "popularidad_contra_KB"
 CANT_PELICULAS = "cantidad_peliculas"
 CANT_ACTORES = "cantidad_actores"
 
-
+###############################################33
 def camino_hasta_kb(grafo, actor_origen):
 	"""Imprime el camino mas corto con el cual se llega desde cualquier actor
 	hasta Kevin Bacon. De no haber camino posible, se debe imprimir un mensaje
@@ -39,7 +40,7 @@ def bacon_number(grafo, actor_origen):
 
 	padres, orden_actores = camino_minimo(grafo, actor_origen, "Bacon Kevin")
 	if not actor_origen in grafo.obtener_vertices():
-		raise ValueError("Actor no encontrado en el grafo")
+		print("Actor no encontrado en el grafo")
 	if not "Bacon Kevin" in orden_actores:
 		print(-1)
 	else:
@@ -51,31 +52,58 @@ def bacon_number_mayor_a_6(grafo):
 	influyen la cantidad de actores con KBN infinito."""
 
 	orden = breathfirstsearch(grafo, "Bacon Kevin")
-	actores_kbn_mayor_a_6 = []
-	for vertice in orden:
-		if orden[vertice] > 6:
-			actores_kbn_mayor_a_6.append(vertice)
-	if len(actores_kbn_mayor_a_6) == 0:
-		print("No existen actores a mas de 6 pasos de Kevin Bacon")
-	return sorted(actores_kbn_mayor_a_6)
+	if len(orden) == 0 : return
+	#Invierto el diccionario de orden asi me quedan los ordenes como clave, y como valores todos los actores con ese orden
+	orden_inverso = defaultdict(list)
+	print("Los actores con un KBN mayor a 6 son: ")
+	for orden, actor in orden.items():
+		orden_inverso[actor].append(orden)
+	#Calculo el maximo orden que hay en el dicc asi recorro de 6 a max+1
+	orden_max = max(list(orden_inverso.keys()))
+	for i in range(6, orden_max + 1):
+		cant_actores = len(orden_inverso[i])
+		print("Con KBN igual a {}: {} actores".format(i, cant_actores))
+	
 
 def bacon_number_infinito(grafo):
 	"""Imprime la cantidad de actores con un KBN infinito. De no haber, se debe imprimir
 	un mensaje acorde."""
 
+	#Los actores con KBN infinito son aquellos que no estan conectados con KB, por lo que
+	#no aparecerian en el diccionario de ordenes de vertices conectados a KB.
+	#Entonces la cantidad total de actores con KBN infinto va a estar dada por la resta
+	#entre la cantidad de vertices del Grafo y la cantidad de actores conectados a KB.
+
+	dicc_orden = breathfirstsearch(grafo, "Bacon Kevin")
+	print(len(grafo.obtener_vertices()) - len(dicc_orden))
+
+
 def bacon_number_promedio(grafo):
 	"""Imprime el KBN promedio. En este numero no influyen la cantidad de actores con
 	KBN infinito, pero si lo hace ek KBN de Kevin Bacon"""
 
+	dicc_orden = breathfirstsearch(grafo, "Bacon Kevin")
+	suma = 0
+	for orden in dicc_orden.values():
+		suma += orden
+	print("El Kevin Bacon Number promedio es {0:.2f}".format(suma / len(dicc_orden.values())))
+
+
 def similares_a_kb(grafo, n):
 	"""Imprime una lista de los n actores mas similares a Kevin Bacon, ordenados de 
 	mayor similitud a menor."""
+
+	v_origen = "Bacon Kevin"
+	lista_similares = similares(grafo, v_origen, n)
+	return lista_similares
 
 def popularidad_contra_kb(grafo, actor):
 	"""Usando la popularidad de KB como base, imprime en porcentaje cuan popular es el
 	actor en comparacion a KB. De no existir el actor ingresado, se debe imprimir 
 	un mensaje acorde y devolver None. Tener en cuenta que Kevin Bacon es un
 	100% de lo popular que es Kevin Bacon"""
+
+
 
 ##ESTADISTICAS
 
@@ -86,36 +114,32 @@ def cantidad_actores(grafo):
 	"""Imprime la cantidad de actores en el DataSet"""
 
 
-		
-
-
-grafo = grafo_crear("test.csv")
-print(camino_hasta_KB(grafo, "Bacon Kevin"))
-#print(bacon_number(grafo, ""))
-#print(bacon_number_mayor_a_6(grafo))
 
 ###################################################################################
 #                            INTERFAZ PARA EL USUARIO                             #
 ###################################################################################
 
-def recibir_comandos(grafo, linea = input()):
+def recibir_comandos(grafo):
 	"""Recibe el grafo principal y una lista de parametros ingresada por el usuario.
 	Efectua las operaciones correspondientes sobre dichos parametros."""
 	
-	lista_parametros = linea.split()
+	linea_stdin = input()
+	lista_parametros = linea_stdin.split("'")
 	if lista_parametros[0] == CAMINO_A_KB:
-		camino_hasta_kb(grafo, lista_parametros[1])
-	else if lista_parametros[0] == KBN:
-		bacon_number(grafo, lista_parametros[1])
-	else if lista_parametros[0] == KBN_unMAYOR_6:
-		bacon_number_mayor_a_6(grafo)
-
-
-
+		print(camino_hasta_kb(grafo, lista_parametros[1]))
+	elif lista_parametros[0] == KBN:
+		print(bacon_number(grafo, lista_parametros[1]))
+	elif lista_parametros[0] == KBN_MAYOR_6:
+		print(bacon_number_mayor_a_6(grafo))
+	elif lista_parametros[0] == KB_SIMILARES:
+		print(similares_a_kb(grafo, lista_parametros[1]))
+	
+	
 def main():
 	"""Recibe por entrada estandar el nombre del programa y el archivo a abrir.
 	Crea el grafo con ese archivo."""
 	grafo = grafo_crear(sys.argv[1])
+	recibir_comandos(grafo)
 
 
 if __name__ == '__main__':
