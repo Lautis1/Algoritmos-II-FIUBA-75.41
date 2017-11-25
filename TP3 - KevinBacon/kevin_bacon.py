@@ -114,8 +114,9 @@ def popularidad_contra_kb(grafo, actor):
 def cantidad_peliculas(grafo):
 	"""Imprime la cantidad de peliculas en el DataSet"""
 
-	#El grafo se basa en un diccionario donde cada actor(clave) tiene asociado una lista de peliculas
-	#Voy a recorrer cada lista de peliculas y devolver la cantidad. ESTO ESTA BIEN PENSADO?
+	#Tendriamos que tener una estructura donde las claves sean los actores
+	#y sus valores asociados, una lista de peliculas
+	#Asi, contamos cantidad de actores y cantidad de peliculas facilmente. ESTO ESTA BIEN PENSADO?
 
 	
 
