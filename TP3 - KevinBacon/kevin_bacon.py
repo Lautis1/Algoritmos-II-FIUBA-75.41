@@ -17,6 +17,7 @@ KB_POPULARIDAD = "popularidad_contra_KB"
 CANT_PELICULAS = "cantidad_peliculas"
 CANT_ACTORES = "cantidad_actores"
 
+
 ###############################################33
 def camino_hasta_kb(grafo, actor_origen):
 	"""Imprime el camino mas corto con el cual se llega desde cualquier actor
@@ -40,11 +41,11 @@ def bacon_number(grafo, actor_origen):
 
 	padres, orden_actores = camino_minimo(grafo, actor_origen, "Bacon Kevin")
 	if not actor_origen in grafo.obtener_vertices():
-		print("Actor no encontrado en el grafo")
+		return("Actor no encontrado en el grafo")
 	if not "Bacon Kevin" in orden_actores:
 		print(-1)
 	else:
-		print("'{}' tiene un Kevin Bacon Number igual a {}".format(actor_origen, orden_actores["Bacon Kevin"]))
+		print("'{}' tiene un Kevin Bacon Number igual a {}.".format(actor_origen, orden_actores["Bacon Kevin"]))
 
 def bacon_number_mayor_a_6(grafo):
 	"""Imprime la cantidad de actores a una distancia mayor a 6 pasos de Kevin Bacon.
@@ -103,12 +104,21 @@ def popularidad_contra_kb(grafo, actor):
 	un mensaje acorde y devolver None. Tener en cuenta que Kevin Bacon es un
 	100% de lo popular que es Kevin Bacon"""
 
-
+	popularidad_de_kb = popularidad(grafo, "Bacon Kevin")
+	popularidad_actor = popularidad(grafo, actor)
+	porcentaje = ((popularidad_actor * 100) / popularidad_de_kb)
+	print("{} es un {:.2f} % de lo popular que es Kevin Bacon".format(actor,porcentaje))
 
 ##ESTADISTICAS
 
 def cantidad_peliculas(grafo):
 	"""Imprime la cantidad de peliculas en el DataSet"""
+
+	#El grafo se basa en un diccionario donde cada actor(clave) tiene asociado una lista de peliculas
+	#Voy a recorrer cada lista de peliculas y devolver la cantidad. ESTO ESTA BIEN PENSADO?
+
+	
+
 
 def cantidad_actores(grafo):
 	"""Imprime la cantidad de actores en el DataSet"""
@@ -119,27 +129,30 @@ def cantidad_actores(grafo):
 #                            INTERFAZ PARA EL USUARIO                             #
 ###################################################################################
 
-def recibir_comandos(grafo):
+def recibir_comandos(grafo, linea_entrada):
 	"""Recibe el grafo principal y una lista de parametros ingresada por el usuario.
 	Efectua las operaciones correspondientes sobre dichos parametros."""
 	
-	linea_stdin = input()
-	lista_parametros = linea_stdin.split("'")
-	if lista_parametros[0] == CAMINO_A_KB:
-		print(camino_hasta_kb(grafo, lista_parametros[1]))
-	elif lista_parametros[0] == KBN:
-		print(bacon_number(grafo, lista_parametros[1]))
-	elif lista_parametros[0] == KBN_MAYOR_6:
+	if len(linea_entrada) == 0:
+		return -1
+	elif linea_entrada[0] == CAMINO_A_KB:
+		print(camino_hasta_kb(grafo, linea_entrada[1]))
+	elif linea_entrada[0] == KBN:
+		print(bacon_number(grafo, linea_entrada[1]))
+	elif linea_entrada[0] == KBN_MAYOR_6:
 		print(bacon_number_mayor_a_6(grafo))
-	elif lista_parametros[0] == KB_SIMILARES:
-		print(similares_a_kb(grafo, lista_parametros[1]))
+	elif linea_entrada[0] == KB_SIMILARES:
+		print(similares_a_kb(grafo, linea_entrada[1]))
 	
 	
 def main():
 	"""Recibe por entrada estandar el nombre del programa y el archivo a abrir.
 	Crea el grafo con ese archivo."""
+
 	grafo = grafo_crear(sys.argv[1])
-	recibir_comandos(grafo)
+	for linea in sys.stdin:
+		linea = linea.rstrip().split("'")
+		recibir_comandos(grafo, linea)
 
 
 if __name__ == '__main__':
