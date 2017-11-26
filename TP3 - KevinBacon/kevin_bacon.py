@@ -96,7 +96,7 @@ def similares_a_kb(grafo, n):
 
 	v_origen = "Bacon Kevin"
 	lista_similares = similares(grafo, v_origen, n)
-	return lista_similares
+	print(lista_similares)
 
 def popularidad_contra_kb(grafo, actor):
 	"""Usando la popularidad de KB como base, imprime en porcentaje cuan popular es el
@@ -133,7 +133,6 @@ def cantidad_actores(grafo):
 def recibir_comandos(grafo, linea_entrada):
 	"""Recibe el grafo principal y una lista de parametros ingresada por el usuario.
 	Efectua las operaciones correspondientes sobre dichos parametros."""
-	
 	if len(linea_entrada) == 0:
 		return -1
 	elif linea_entrada[0] == CAMINO_A_KB:
@@ -143,7 +142,7 @@ def recibir_comandos(grafo, linea_entrada):
 	elif linea_entrada[0] == KBN_MAYOR_6:
 		print(bacon_number_mayor_a_6(grafo))
 	elif linea_entrada[0] == KB_SIMILARES:
-		print(similares_a_kb(grafo, linea_entrada[1]))
+		similares_a_kb(grafo, int(linea_entrada[1]))
 	
 	
 def main():
@@ -151,8 +150,9 @@ def main():
 	Crea el grafo con ese archivo."""
 
 	grafo = grafo_crear(sys.argv[1])
+	print("Ya procese el grafo")
 	for linea in sys.stdin:
-		linea = linea.rstrip().split("'")
+		linea = linea.rstrip().split()
 		recibir_comandos(grafo, linea)
 
 
