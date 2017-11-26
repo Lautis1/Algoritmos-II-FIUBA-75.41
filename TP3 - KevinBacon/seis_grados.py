@@ -1,10 +1,9 @@
-############ IMPLEMENTACION DE FUNCIONES PARA USO EN TP3 ################
+# IMPLEMENTACION DE FUNCIONES PARA USO EN TP3 #
 
 from collections import deque
 from collections import defaultdict
 from itertools import combinations
 from grafo import *
-import gc
 import random
 import csv
 
@@ -33,7 +32,7 @@ def camino_minimo(grafo, origen, destino, grado_buscado):
     grado_vertices[origen] = 0
     while len(cola) > 0:
         v_actual = cola.popleft()
-        if v_actual == destino or grado_vertices[v_actual] >= grado_buscado:
+        if v_actual == destino or (grado_vertices[v_actual] >= grado_buscado != -1):
             break
         for v_ady in grafo.obtener_adyacentes(v_actual):
             if v_ady not in vertices_visitados:
@@ -50,13 +49,13 @@ def camino_minimo(grafo, origen, destino, grado_buscado):
 
 def grafo_crear(nombre_archivo):
     """
-	Crea un grafo de conexiones de actores a partir de un archivo de datos.
+    Crea un grafo de conexiones de actores a partir de un archivo de datos.
 
-	PRE: Recibe el nombre de un archivo separado por comas que contenga de lineas:
-		actor,pelicula,pelicula,pelicula
-		que equivalen a: vertice,arista,arista,arista
-	POST: Devuelve un grafo creado a partir de estos datos.
-	"""
+    PRE: Recibe el nombre de un archivo separado por comas que contenga de lineas:
+        actor,pelicula,pelicula,pelicula
+        que equivalen a: vertice,arista,arista,arista
+    POST: Devuelve un grafo creado a partir de estos datos.
+    """
     grafo = Grafo()
     dicc_pelis = defaultdict(dict)  # Para ahorrarse el chequeo de ver si el dic tiene cierto elemento antes de agregar.
     with open(nombre_archivo) as actores:
@@ -77,9 +76,13 @@ def camino(grafo, origen, llegada):
 
     PRE: Recibe el grafo, un actor de origen y un actor de llegada.
     POST: Devuelve una lista ordenada de cadenas (peliculas) para llegar desde
-    el origen hasta el final.
+    el origen hasta el final. None en caso de que no halla camino desde el actor origen hasta la llegada.
+    Una lista vacia en caso de que el actor de llegada sea igual al actor de origen.
     """
+
     padresV, _ = camino_minimo(grafo, origen, llegada, -1)
+    if llegada not in padresV:
+        return None
     recorrid_min = [llegada]
     v_actual = padresV[llegada]
     while v_actual is not None:
@@ -134,13 +137,13 @@ def popularidad(grafo, actor):
 
 def similares(grafo, origen, n):
     """
-	Calcula los n actores mas similares al actor de origen y los devuelve en una
-	lista ordenada de mayor similitud a menor.
+    Calcula los n actores mas similares al actor de origen y los devuelve en una
+    lista ordenada de mayor similitud a menor.
 
-	PRE: Recibe el grafo, el actor de origen, y el n deseado
-	POST: Devuelve una lista de los n actores no adyacentes mas similares al
-		pedido. La lista no debe contener al actor de origen.
-	"""
+    PRE: Recibe el grafo, el actor de origen, y el n deseado
+    POST: Devuelve una lista de los n actores no adyacentes mas similares al
+        pedido. La lista no debe contener al actor de origen.
+    """
     cantidad_de_caminatas = int(len(grafo.obtener_vertices()) / 50)
     largo_caminata = int(cantidad_de_caminatas / 5)  # Las cantidades estan son arbitrarias, despues vemos que cantidad va mejor.
     actores_similares = defaultdict(int)
@@ -158,3 +161,11 @@ def similares(grafo, origen, n):
     lista_similares = sorted(actores_similares, key=actores_similares.get, reverse=True)
 
     return lista_similares[0:n]
+
+
+def actor_existe(grafo, actor_buscado):
+    return actor_buscado in grafo.obtener_vertices()
+
+
+def cantidad_de_actores(grafo):
+    return len(grafo.obtener_vertices())
