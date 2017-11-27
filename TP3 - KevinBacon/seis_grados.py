@@ -21,6 +21,10 @@ def camino_minimo(grafo, origen, destino, grado_buscado):
     """Recorre el grafo con BFS para buscar el camino minimo entre dos vertices.
     Devuelve un diccionario de vertices con sus correspondientes padres como valor
     y otro diccionario con vertices como clave y sus grados como valores."""
+    # MB: para camino minimo no tiene sentido devolver ese diccionario de grados. 
+    # Eso quiere decir que la funcion hace mas que solo buscar el camino minimo, 
+    # sino que es mas general (lo cual esta bien, el tema es que el nombre esta mal, 
+    # seria mas correcto que se llame BFS o BFS_algunacosa)
 
     cola = deque()
     vertices_visitados = {}
@@ -146,6 +150,8 @@ def similares(grafo, origen, n):
     """
     cantidad_de_caminatas = int(len(grafo.obtener_vertices()) / 50)
     largo_caminata = int(cantidad_de_caminatas / 5)  # Las cantidades estan son arbitrarias, despues vemos que cantidad va mejor.
+    # Justamente como conviene ver despues cual es mejor valor, lo mejor es usar constantes!
+
     actores_similares = defaultdict(int)
 
     for i in range(cantidad_de_caminatas):
@@ -168,6 +174,7 @@ def similares(grafo, origen, n):
 
 def actor_existe(grafo, actor_buscado):
     return actor_buscado in grafo.obtener_vertices()
+    # con el cambio que propuse de poder preguntarle al grafo si existe un vertice, esto seria simplemente `return actor_buscado in grafo`
 
 
 def cantidad_de_actores(grafo):
