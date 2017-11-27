@@ -165,6 +165,8 @@ def recibir_comandos(grafo, linea_entrada):
 		popularidad_contra_kb(grafo, linea_entrada[1])
 	elif comando == CANT_ACTORES:
 		cantidad_actores(grafo)
+	else:
+		print('Comando desconocido: "{}"'.format(comando))
 
 
 def main():
@@ -172,6 +174,10 @@ def main():
 	Crea el grafo con ese archivo."""
 
 	grafo = grafo_crear(sys.argv[1])
+	print(popularidad(grafo, "Bacon Kevin"))
+	print(popularidad(grafo, "Penn Sean"))
+	print(popularidad(grafo, "Watts Naomi"))
+
 	for linea in sys.stdin:
 		linea = linea.rstrip().split("'")
 		recibir_comandos(grafo, linea)
