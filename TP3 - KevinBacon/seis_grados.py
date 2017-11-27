@@ -157,6 +157,9 @@ def similares(grafo, origen, n):
     # Saco el actor de origen de el dict de actores_similares
     if origen in actores_similares:
         del actores_similares[origen]
+    for adyacente in grafo.obtener_adyacentes(origen):
+        if adyacente in actores_similares:
+            del actores_similares[adyacente]
     # Ordeno en base a la cantidad de veces que la random_walk paso por cada actor.
     lista_similares = sorted(actores_similares, key=actores_similares.get, reverse=True)
 
