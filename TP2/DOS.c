@@ -21,15 +21,6 @@ time_t iso8601_to_time(const char* iso8601) {
     return mktime(&bktime);
 }
 
-//Dada una ip, un puntero a una lista y un puntero a un ABB, detecta si
-//un usuario hizo mas solicitudes de las permitidas en menos de 2 segundos.
-bool detectar_DOS(const char* ip, void* dato1, void* hash) {
-    lista_t* lista_solicitudes = hash_obtener((hash_t*)hash, ip);
-    if(lista_solicitudes != NULL && usuario_hizo_mas_solicitudes_de_las_permitidas(lista_solicitudes)) {
-        imprimir_dos(ip);
-    }
-    return true;
-}
 
 //Recorre la lista de solicitudes y detecta si una direccion ip es sospechosa de DoS
 //Devuelve true o false dependiendo del estado de la operacion.
@@ -73,14 +64,32 @@ bool agregar_fecha_de_solicitud(char* ip, time_t* fecha, hash_t* peticiones_por_
 }
 
 //Imprimir posibles ip con DoS
-void imprimir_dos(const char* direccion_ip){
+bool imprimir_dos(const char* direccion_ip, void* dato1, void* dato2){
 
     fprintf(stdout,"DoS: %s\n", direccion_ip);
+    return true;
 }
 
 //Funcion que modifica la firma de lista_destruir para ser utilizada en otra funcion.
 void wrapper_destruir_hash_solicitudes(void* lista) {
     lista_t* lista_solicitudes = lista;
     lista_destruir(lista_solicitudes, free);
+}
+
+void identificar_posibles_DOS(hash_t* hash_a_analizar, abb_t* abb_temp_DOS) {
+
+    hash_iter_t* iter_hash = hash_iter_crear(hash_a_analizar);
+    if(iter_hash == NULL) return;
+
+    while (!hash_iter_al_final(iter_hash)) {
+        char* clave_actual = (char*)hash_iter_ver_actual(iter_hash);
+        lista_t* lista_solicitudes = hash_obtener(hash_a_analizar, clave_actual);
+        if (usuario_hizo_mas_solicitudes_de_las_permitidas(lista_solicitudes)) {
+            abb_guardar(abb_temp_DOS, clave_actual, NULL);
+        }
+
+        hash_iter_avanzar(iter_hash);
+    }
+    hash_iter_destruir(iter_hash);
 }
 

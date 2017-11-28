@@ -17,9 +17,13 @@ GRADO_CONSIDERADO_PARA_POPULARIDAD = 2
 ###################################################################################
 
 
-def camino_minimo(grafo, origen, destino, grado_buscado):
-    """Recorre el grafo con BFS para buscar el camino minimo entre dos vertices.
-    Devuelve un diccionario de vertices con sus correspondientes padres como valor
+def buscar_grados_y_padres(grafo, origen, destino, grado_buscado):
+    """ Pre: Recibe un grafo, un vertice de origen , y opcionalmente puede recibir un destino, si no se
+    esta buscando un vertice especifico se le pasa None como destino. Tambien opcionalmente puede recibir un grado buscado
+    , en ese caso el algoritmo seguira buscando vertices hasta que encuentre un vertice con grado mayor al buscado. Si no se desea
+    buscar un grado en especial la funcion recibe -1 como grado_buscado.
+    Recorre el grafo con BFS para buscar el camino minimo entre dos vertices.
+    Post: Devuelve un diccionario de vertices con sus correspondientes padres como valor
     y otro diccionario con vertices como clave y sus grados como valores."""
 
     cola = deque()
@@ -80,7 +84,7 @@ def camino(grafo, origen, llegada):
     Una lista vacia en caso de que el actor de llegada sea igual al actor de origen.
     """
 
-    padresV, _ = camino_minimo(grafo, origen, llegada, -1)
+    padresV, _ = buscar_grados_y_padres(grafo, origen, llegada, -1)
     if llegada not in padresV:
         return None
     recorrid_min = [llegada]
@@ -106,7 +110,7 @@ def actores_a_distancia(grafo, origen, n):
     POST: Devuelve la lista de cadenas (actores) a n pasos del recibido.
     """
 
-    _, dicc_orden = camino_minimo(grafo, origen, None, n)
+    _, dicc_orden = buscar_grados_y_padres(grafo, origen, None, n)
     act_n_distantes = []
     for vertice in dicc_orden:
         if dicc_orden[vertice] == n:
@@ -127,12 +131,8 @@ def popularidad(grafo, actor):
     """
     if actor not in grafo.vertices:
         return 0
-    peliculas_actor = set()
     cantidad_de_actores_grado_dos = len(actores_a_distancia(grafo, actor, GRADO_CONSIDERADO_PARA_POPULARIDAD))
-    for actor_adyacente in grafo.obtener_adyacentes(actor):
-        for pelis in grafo.obtener_aristas(actor, actor_adyacente):
-            peliculas_actor.add(pelis)
-    return cantidad_de_actores_grado_dos * len(peliculas_actor)
+    return cantidad_de_actores_grado_dos * len((grafo.obtener_aristas_por_vertice())[actor])
 
 
 def similares(grafo, origen, n):
@@ -167,8 +167,12 @@ def similares(grafo, origen, n):
 
 
 def actor_existe(grafo, actor_buscado):
-    return actor_buscado in grafo.obtener_vertices()
+    return actor_buscado in grafo
 
 
 def cantidad_de_actores(grafo):
-    return len(grafo.obtener_vertices())
+    return len(grafo)
+
+
+def cantidad_de_peliculas(grafo):
+    return grafo.cantidad_aristas()
