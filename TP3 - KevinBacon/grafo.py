@@ -9,8 +9,16 @@ class Grafo:
     def __init__(self):
         """Constructor de un grafo vacio. Crea un diccionario de vertices"""
         self.vertices = {}
-        # Ahora self.vertices es un diccionario de diccionarios de sets.
-        # Elimine cantidad de aristas, no sirve, cantidad de aristas != cantidad de peliculas.
+        self.aristas = defaultdict(set)
+
+    def __iter__(self):
+        return iter(self.vertices)
+
+    def __len__(self):
+        return len(self.vertices)
+
+    def __contains__(self, item):
+        return item in self.vertices
 
     def agregar_vertice(self, nombre_vertice):
         """Recibe el grafo y un vertice. Si el vertice no se encuentra en el grafo,
@@ -35,12 +43,15 @@ class Grafo:
 
         self.vertices[vertice_origen][vertice_destino].add(nombre)
         self.vertices[vertice_destino][vertice_origen].add(nombre)
+        self.aristas[vertice_destino].add(nombre)
+        self.aristas[vertice_origen].add(nombre)
 
     def eliminar_arista(self, vertice_origen, vertice_destino):
         """Borra la arista que une los dos vertices recibidos por parametro"""
 
         if vertice_origen not in self.vertices or vertice_destino not in self.vertices:
             return
+        # TODO
         del self.vertices[vertice_origen][vertice_destino]
         del self.vertices[vertice_destino][vertice_origen]
 
@@ -63,9 +74,19 @@ class Grafo:
         """Devuelve una lista de todos los vertices presentes en el grafo"""
         return self.vertices.keys()
 
-    def obtener_aristas(self, vertice1, vertice2):
+    def obtener_aristas_por_vertice(self):
+        return self.aristas
+
+    def cantidad_aristas(self):
+        peliculas = set()
+        for vertice in self.aristas:
+            for arista in vertice:
+                peliculas.add(arista)
+        return len(peliculas)
+
+    def info_arista(self, vertice1, vertice2):
         """Devuelve la informacion que contiene la arista que une dos vertices"""
-        return self.vertices[vertice1][vertice2]
+        return list(self.vertices[vertice1][vertice2])[0]
 
     def __str__(self):
         return str(self.vertices)
