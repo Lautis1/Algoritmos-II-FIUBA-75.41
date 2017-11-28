@@ -148,6 +148,7 @@ def cantidad_actores(grafo):
 ###################################################################################
 
 def recibir_comandos(grafo, linea_entrada):
+  
     """Recibe el grafo principal y una lista de parametros ingresada por el usuario.
     Efectua las operaciones correspondientes sobre dichos parametros."""
 
