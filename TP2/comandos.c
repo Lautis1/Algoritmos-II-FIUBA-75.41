@@ -13,6 +13,8 @@ bool procesar_log(char* nombre_de_archivo, hash_t* recursos_mas_solicitados, abb
     size_t capacidad = 0;
     ssize_t leidos;
 
+    abb_t* DoS = abb_crear(comparar_ips, NULL);
+
     hash_t* peticiones_por_ip = hash_crear((hash_destruir_dato_t)wrapper_destruir_hash_solicitudes);
     if (peticiones_por_ip == NULL) return false;
 
@@ -29,7 +31,9 @@ bool procesar_log(char* nombre_de_archivo, hash_t* recursos_mas_solicitados, abb
         aumenta_cont_solicitudes_recurso(recursos_mas_solicitados, nombre_recurso);
         free_strv(linea_a_procesar);
     }
-    abb_in_order(visitantes, detectar_DOS, peticiones_por_ip);
+    identificar_posibles_DOS(peticiones_por_ip, DoS);
+    abb_in_order(DoS, imprimir_dos, NULL);
+    abb_destruir(DoS);
     hash_destruir(peticiones_por_ip);
     free(linea);
     fclose(archivo);
