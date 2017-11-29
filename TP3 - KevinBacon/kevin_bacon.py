@@ -19,10 +19,7 @@ KB_SIMILARES = "similares_a_KB"
 KB_POPULARIDAD = "popularidad_contra_KB"
 CANT_PELICULAS = "cantidad_peliculas"
 CANT_ACTORES = "cantidad_actores"
-
-
-###############################################
-
+#-----------------------------------------------------------------------------------#
 
 def camino_hasta_kb(grafo, actor_origen):
     """Imprime el camino mas corto con el cual se llega desde cualquier actor
@@ -31,7 +28,7 @@ def camino_hasta_kb(grafo, actor_origen):
     una lista vacia, y de no existir el actor ingresado, se debe imprimir un
     mensaje acorde"""
 
-    camino_a_kb = camino(grafo, ACTOR_CENTRAL_F, actor_origen)
+    camino_a_kb = camino(grafo, actor_origen, ACTOR_CENTRAL_F)
     if not actor_existe(grafo, actor_origen):
         print("El actor ingresado no ha sido encontrado")
     elif camino_a_kb is None:
@@ -48,7 +45,7 @@ def bacon_number(grafo, actor_origen):
     no existir el actor ingresado, se debe imprimir un mensaje acorde.
     Tener en cuenta que el KBN de Kevin Bacon es 0"""
 
-    camino_a_KB = camino(grafo, ACTOR_CENTRAL_F, actor_origen)
+    camino_a_KB = camino(grafo, actor_origen, ACTOR_CENTRAL_F)
     bacon_number = -1
     if not actor_existe(grafo, actor_origen):
         print("El actor ingresado no ha sido encontrado")
@@ -63,7 +60,7 @@ def bacon_number_mayor_a_6(grafo):
     De no existir actores a mas pasos que 6, se imprime un mensaje acorde. En este numero no
     influyen la cantidad de actores con KBN infinito."""
 
-    _, orden = camino_minimo(grafo, ACTOR_CENTRAL_F, None, -1)
+    _, orden = buscar_grados_y_padres(grafo, ACTOR_CENTRAL_F, None, -1)
     if len(orden) == 0: return
     # Invierto el diccionario de orden asi me quedan los ordenes como clave, y como valores todos los actores con ese orden
     orden_inverso = defaultdict(list)
@@ -86,21 +83,23 @@ def bacon_number_infinito(grafo):
     # Entonces la cantidad total de actores con KBN infinto va a estar dada por la resta
     # entre la cantidad de vertices del Grafo y la cantidad de actores conectados a KB.
 
-    _, dicc_orden = camino_minimo(grafo, "Bacon Kevin", None, -1)
+    _, dicc_orden = buscar_grados_y_padres(grafo, "Bacon Kevin", None, -1)
     if(len(dicc_orden)) == 0:
         print("No existen actores con un KBN infinito")
-    print(len(grafo.obtener_vertices()) - len(dicc_orden))
+    cantidad = len(grafo.obtener_vertices()) - len(dicc_orden)
+    print("Los actores con un Bacon Number infinito son {}".format(cantidad))
+  
 
 
 def bacon_number_promedio(grafo):
     """Imprime el KBN promedio. En este numero no influyen la cantidad de actores con
     KBN infinito, pero si lo hace ek KBN de Kevin Bacon"""
 
-    _, dicc_orden = camino_minimo(grafo, "Bacon Kevin", None, -1)
+    _, dicc_orden = buscar_grados_y_padres(grafo, "Bacon Kevin", None, -1)
     suma = 0
     for orden in dicc_orden.values():
         suma += orden
-    print("El {} Number promedio es {0:.2f}".format(ACTOR_CENTRAL, suma / len(dicc_orden.values())))
+    print("El {} Number promedio es {:.2f}".format(ACTOR_CENTRAL, suma / len(dicc_orden.values())))
 
 
 def similares_a_kb(grafo, n):
@@ -129,19 +128,15 @@ def popularidad_contra_kb(grafo, actor):
 
 def cantidad_peliculas(grafo):
     """Imprime la cantidad de peliculas en el DataSet"""
-    print(cantidad_de_peliculas(grafo))
-
-# Tendriamos que tener una estructura donde las claves sean los actores
-# y sus valores asociados, una lista de peliculas
-# Asi, contamos cantidad de actores y cantidad de peliculas facilmente. ESTO ESTA BIEN PENSADO?
-
-
-
+    
+    cant_pelis = cantidad_de_peliculas(grafo)
+    print("El dataset contiene {} películas.".format(cant_pelis))
 
 def cantidad_actores(grafo):
     """Imprime la cantidad de actores en el DataSet"""
-    print(cantidad_de_actores(grafo))
-
+    
+    cant_actores = cantidad_de_actores(grafo)
+    print("El dataset contiene {} actores.".format(cant_actores))
 
 ###################################################################################
 #                            INTERFAZ PARA EL USUARIO                             #
