@@ -19,7 +19,10 @@ KB_SIMILARES = "similares_a_KB"
 KB_POPULARIDAD = "popularidad_contra_KB"
 CANT_PELICULAS = "cantidad_peliculas"
 CANT_ACTORES = "cantidad_actores"
-#-----------------------------------------------------------------------------------#
+
+
+# -----------------------------------------------------------------------------------#
+
 
 def camino_hasta_kb(grafo, actor_origen):
     """Imprime el camino mas corto con el cual se llega desde cualquier actor
@@ -29,9 +32,11 @@ def camino_hasta_kb(grafo, actor_origen):
     mensaje acorde"""
 
     camino_a_kb = camino(grafo, actor_origen, ACTOR_CENTRAL_F)
-    if not actor_existe(grafo, actor_origen):
+
+    if camino_a_kb is False:
         print("El actor ingresado no ha sido encontrado")
-    elif camino_a_kb is None:
+        return
+    if camino_a_kb is None:
         print("No hay conexión entre {} y '{}'".format(ACTOR_CENTRAL, actor_origen))
         return []
     else:
@@ -46,11 +51,11 @@ def bacon_number(grafo, actor_origen):
     Tener en cuenta que el KBN de Kevin Bacon es 0"""
 
     camino_a_KB = camino(grafo, actor_origen, ACTOR_CENTRAL_F)
-    bacon_number = -1
-    if not actor_existe(grafo, actor_origen):
+    if camino_a_KB is False:
         print("El actor ingresado no ha sido encontrado")
         return
-    elif camino_a_KB is not None:
+    bacon_number = -1
+    if camino_a_KB is not None:
         bacon_number = len(camino_a_KB)
     print("'{}' tiene un {} Number igual a {}.".format(actor_origen, ACTOR_CENTRAL, bacon_number))
 
@@ -62,7 +67,7 @@ def bacon_number_mayor_a_6(grafo):
 
     _, orden = buscar_grados_y_padres(grafo, ACTOR_CENTRAL_F, None, -1)
     if len(orden) == 0: return
-    # Invierto el diccionario de orden asi me quedan los ordenes como clave, y como valores todos los actores con ese orden
+    # Invierto el diccionario de orden asi quedan los ordenes como clave, y como valores todos los actores con ese orden
     orden_inverso = defaultdict(list)
     for orden, actor in orden.items():
         orden_inverso[actor].append(orden)
@@ -90,7 +95,6 @@ def bacon_number_infinito(grafo):
     print("Los actores con un Bacon Number infinito son {}".format(cantidad))
   
 
-
 def bacon_number_promedio(grafo):
     """Imprime el KBN promedio. En este numero no influyen la cantidad de actores con
     KBN infinito, pero si lo hace ek KBN de Kevin Bacon"""
@@ -105,8 +109,11 @@ def bacon_number_promedio(grafo):
 def similares_a_kb(grafo, n):
     """Imprime una lista de los n actores mas similares a Kevin Bacon, ordenados de
     mayor similitud a menor."""
+    if n < 0:
+        print("Por favor ingrese un valor valido para el comando")
+        return
 
-    print(similares(grafo, ACTOR_CENTRAL_F, n))
+    print("Los {} actores mas similares a KB son: {}".format(n, similares(grafo, ACTOR_CENTRAL_F, n)))
 
 
 def popularidad_contra_kb(grafo, actor):
@@ -115,22 +122,24 @@ def popularidad_contra_kb(grafo, actor):
     un mensaje acorde y devolver None. Tener en cuenta que Kevin Bacon es un
     100% de lo popular que es Kevin Bacon"""
 
-    if not actor in grafo.obtener_vertices():
-        print("No existe el actor ingresado")
-        return None
+
     popularidad_de_kb = popularidad(grafo, ACTOR_CENTRAL_F)
     popularidad_actor = popularidad(grafo, actor)
+    if not popularidad_actor:
+        print("No existe el actor ingresado")
+        return
     porcentaje = ((popularidad_actor * 100) / popularidad_de_kb)
     print("{} es un {:.2f} % de lo popular que es {}".format(actor, porcentaje, ACTOR_CENTRAL))
 
 
-##ESTADISTICAS
+# ESTADISTICAS
 
 def cantidad_peliculas(grafo):
     """Imprime la cantidad de peliculas en el DataSet"""
     
     cant_pelis = cantidad_de_peliculas(grafo)
     print("El dataset contiene {} películas.".format(cant_pelis))
+
 
 def cantidad_actores(grafo):
     """Imprime la cantidad de actores en el DataSet"""
@@ -141,6 +150,7 @@ def cantidad_actores(grafo):
 ###################################################################################
 #                            INTERFAZ PARA EL USUARIO                             #
 ###################################################################################
+
 
 def recibir_comandos(grafo, linea_entrada):
   
